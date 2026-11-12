@@ -3,13 +3,22 @@
 > **TAGLINE:** Secure. Automate. Monitor. Recover.
 
 [![GitHub Pages Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-08482D?style=for-the-badge&logo=github&logoColor=white)](https://rashmigowda1206.github.io/WareHouseX/)
+[![Deployment Status](https://img.shields.io/badge/Deployment-Live%20%26%20Operational-22C55E?style=for-the-badge&logo=githubactions&logoColor=white)](https://github.com/Rashmigowda1206/WareHouseX/actions)
 [![GitHub Repository](https://img.shields.io/badge/GitHub-Rashmigowda1206%2FWareHouseX-101410?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Rashmigowda1206/WareHouseX)
 
 🌐 **Live Web Application (GitHub Pages):** [https://rashmigowda1206.github.io/WareHouseX/](https://rashmigowda1206.github.io/WareHouseX/)
 
-> **Quick Access Credentials:**
-> * **Administrator:** `admin` / `AdminPass123!` (Full server administration, UFW, TAR backups, inventory)
-> * **Warehouse Staff:** `staff` / `StaffPass123!` (Inventory catalog and order restocking operations)
+---
+
+### 🔑 Preconfigured Demo Credentials
+
+| Role | Username | Password | Access Capabilities |
+|---|---|---|---|
+| **Administrator** | `admin` | `AdminPass123!` | Full Linux server administration, LVM storage, UFW firewall, TAR backups, disaster recovery, inventory & employee management |
+| **Warehouse Manager** | `manager` | `ManagerPass123!` | Inventory operations, telemetry dashboard, employee oversight, and operational reporting |
+| **Warehouse Staff** | `staff` | `StaffPass123!` | Stock catalog browsing, order fulfillment, and restocking operations |
+
+> 💡 **Quick Fill:** On the login page, click any of the **Quick-Fill Preconfigured Roles** buttons (`Administrator`, `WH Manager`, `WH Staff`) for instant one-click login!
 
 ---
 
