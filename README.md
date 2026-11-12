@@ -2,15 +2,9 @@
 ### Intelligent E-Commerce Warehouse Management & Linux Server Administration System
 > **TAGLINE:** Secure. Automate. Monitor. Recover.
 
-[![GitHub Pages Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-08482D?style=for-the-badge&logo=github&logoColor=white)](https://rashmigowda1206.github.io/WareHouseX/)
-[![Deployment Status](https://img.shields.io/badge/Deployment-Live%20%26%20Operational-22C55E?style=for-the-badge&logo=githubactions&logoColor=white)](https://github.com/Rashmigowda1206/WareHouseX/actions)
-[![GitHub Repository](https://img.shields.io/badge/GitHub-Rashmigowda1206%2FWareHouseX-101410?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Rashmigowda1206/WareHouseX)
-
-🌐 **Live Web Application (GitHub Pages):** [https://rashmigowda1206.github.io/WareHouseX/](https://rashmigowda1206.github.io/WareHouseX/)
-
 ---
 
-### 🔑 Preconfigured Demo Credentials
+### 🔑 Preconfigured Access Credentials
 
 | Role | Username | Password | Access Capabilities |
 |---|---|---|---|
