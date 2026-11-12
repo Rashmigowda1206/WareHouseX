@@ -2,17 +2,7 @@
 ### Intelligent E-Commerce Warehouse Management & Linux Server Administration System
 > **TAGLINE:** Secure. Automate. Monitor. Recover.
 
----
-
-### 🔑 Preconfigured Access Credentials
-
-| Role | Username | Password | Access Capabilities |
-|---|---|---|---|
-| **Administrator** | `admin` | `AdminPass123!` | Full Linux server administration, LVM storage, UFW firewall, TAR backups, disaster recovery, inventory & employee management |
-| **Warehouse Manager** | `manager` | `ManagerPass123!` | Inventory operations, telemetry dashboard, employee oversight, and operational reporting |
-| **Warehouse Staff** | `staff` | `StaffPass123!` | Stock catalog browsing, order fulfillment, and restocking operations |
-
-> 💡 **Quick Fill:** On the login page, click any of the **Quick-Fill Preconfigured Roles** buttons (`Administrator`, `WH Manager`, `WH Staff`) for instant one-click login!
+🌐 **Website:** [https://rashmigowda1206.github.io/WareHouseX/](https://rashmigowda1206.github.io/WareHouseX/)
 
 ---
 
