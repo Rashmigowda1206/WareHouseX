@@ -20,5 +20,5 @@ JWT_EXPIRATION_HOURS = 24
 # auto: Detects Linux kernel / bash. If unavailable, falls back to demo emulator
 SYSTEM_MODE = os.getenv("WAREHOUSEX_MODE", "auto")
 HOST = os.getenv("WAREHOUSEX_HOST", "0.0.0.0")
-PORT = int(os.getenv("WAREHOUSEX_PORT", "5000"))
+PORT = int(os.getenv("PORT", os.getenv("WAREHOUSEX_PORT", "5000")))
 DEBUG = os.getenv("WAREHOUSEX_DEBUG", "True").lower() in ("true", "1")

@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  warehousex:
+    build: .
+    container_name: warehousex-app
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      - WAREHOUSEX_MODE=auto
+      - WAREHOUSEX_SECRET_KEY=whx_production_secret_key_2026
+    volumes:
+      - warehousex_data:/app/backend/backups_storage
+      - warehousex_db:/app/backend/database
+
+volumes:
+  warehousex_data:
+  warehousex_db:

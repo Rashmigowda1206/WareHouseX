@@ -1,5 +1,5 @@
 import os
-from flask import Flask, jsonify
+from flask import Flask, jsonify, send_from_directory
 from flask_cors import CORS
 from config import SECRET_KEY, HOST, PORT, DEBUG, SYSTEM_MODE
 from database.db import init_db
@@ -12,7 +12,8 @@ if SYSTEM_MODE in ("live", "demo", "auto"):
     system_adapter.set_mode(SYSTEM_MODE)
 
 def create_app():
-    app = Flask(__name__)
+    FRONTEND_DIST = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "frontend", "dist"))
+    app = Flask(__name__, static_folder=FRONTEND_DIST, static_url_path="")
     app.config["SECRET_KEY"] = SECRET_KEY
 
     # Enable CORS for frontend Vite dev & production
@@ -55,9 +56,21 @@ def create_app():
             "is_linux": system_adapter.is_linux
         }), 200
 
-    @app.errorhandler(404)
-    def handle_404(e):
-        return jsonify({"error": "Requested resource was not found"}), 404
+    # Serve built React frontend single-page application
+    @app.route("/", defaults={"path": ""})
+    @app.route("/<path:path>")
+    def serve_frontend(path):
+        if path.startswith("api/"):
+            return jsonify({"error": "Requested API route was not found"}), 404
+        if path and os.path.exists(os.path.join(FRONTEND_DIST, path)):
+            return send_from_directory(FRONTEND_DIST, path)
+        if os.path.exists(os.path.join(FRONTEND_DIST, "index.html")):
+            return send_from_directory(FRONTEND_DIST, "index.html")
+        return jsonify({
+            "service": "WareHouseX Enterprise API",
+            "status": "online",
+            "message": "Frontend build not detected. Build with 'npm run build' inside frontend/"
+        }), 200
 
     @app.errorhandler(500)
     def handle_500(e):
@@ -65,8 +78,10 @@ def create_app():
 
     return app
 
+# WSGI Application entrypoint
+app = create_app()
+
 if __name__ == "__main__":
-    app = create_app()
     print(f"[*] WareHouseX Backend running on http://{HOST}:{PORT}")
     print(f"[*] Operational Mode: {system_adapter.get_current_mode().upper()}")
     app.run(host=HOST, port=PORT, debug=DEBUG)

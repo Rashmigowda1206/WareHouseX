@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: warehousex
+    runtime: python
+    plan: free
+    region: oregon
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn --chdir backend app:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: NODE_VERSION
+        value: 20.12.0
+      - key: WAREHOUSEX_MODE
+        value: demo
+      - key: WAREHOUSEX_SECRET_KEY
+        generateValue: true
