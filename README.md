@@ -2,10 +2,10 @@
 ### Intelligent E-Commerce Warehouse Management & Linux Server Administration System
 > **TAGLINE:** Secure. Automate. Monitor. Recover.
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-warehouse--inky--one.vercel.app-08482D?style=for-the-badge&logo=vercel&logoColor=white)](https://warehouse-inky-one.vercel.app)
+[![GitHub Pages Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-08482D?style=for-the-badge&logo=github&logoColor=white)](https://rashmigowda1206.github.io/WareHouseX/)
 [![GitHub Repository](https://img.shields.io/badge/GitHub-Rashmigowda1206%2FWareHouseX-101410?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Rashmigowda1206/WareHouseX)
 
-🌐 **Live Web Application:** [https://warehouse-inky-one.vercel.app](https://warehouse-inky-one.vercel.app)
+🌐 **Live Web Application (GitHub Pages):** [https://rashmigowda1206.github.io/WareHouseX/](https://rashmigowda1206.github.io/WareHouseX/)
 
 > **Quick Access Credentials:**
 > * **Administrator:** `admin` / `AdminPass123!` (Full server administration, UFW, TAR backups, inventory)
