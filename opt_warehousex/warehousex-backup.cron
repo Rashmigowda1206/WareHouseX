@@ -1,0 +1,9 @@
+# /etc/cron.d/warehousex-backup: Automated Warehouse TAR Archive Automation
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+# Daily full backup at 02:00 UTC with SHA-256 verification
+0 2 * * * root /opt/warehousex/backup_warehouse.sh full > /var/log/warehousex/cron_backup.log 2>&1
+
+# Hourly telemetry snapshot for load auditing
+0 * * * * root /opt/warehousex/system_monitor.sh text >> /var/log/warehousex/hourly_metrics.log 2>&1

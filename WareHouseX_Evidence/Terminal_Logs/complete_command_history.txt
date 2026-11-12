@@ -1,0 +1,34 @@
+# Bash Command History - Rashmi Gowda (Ubuntu-Linux-Admin)
+sudo apt update && sudo apt upgrade -y
+sudo apt install -y python3-pip python3-venv nodejs npm lvm2 ufw openssh-server tar tree
+sudo pvcreate /dev/sdb /dev/sdc
+sudo vgcreate vg_warehousex /dev/sdb /dev/sdc
+sudo lvcreate -n lv_opt -L 20G vg_warehousex
+sudo lvcreate -n lv_backups -L 50G vg_warehousex
+sudo mkfs.ext4 /dev/vg_warehousex/lv_opt
+sudo mkfs.ext4 /dev/vg_warehousex/lv_backups
+sudo mkdir -p /opt/warehousex /var/backups/warehousex
+sudo mount /dev/vg_warehousex/lv_opt /opt/warehousex
+sudo mount /dev/vg_warehousex/lv_backups /var/backups/warehousex
+sudo groupadd warehouse-admins
+sudo groupadd warehouse-staff
+sudo usermod -aG warehouse-admins rashmigowda
+cd /home/rashmigowda/WareHouseX
+python3 -m venv venv
+source venv/bin/activate
+pip install -r backend/requirements.txt
+python3 backend/database/seed_data.py
+cd frontend && npm install && npm run build
+sudo cp /opt/warehousex/warehousex.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now warehousex.service
+sudo systemctl status warehousex.service
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow 22/tcp comment 'Hardened OpenSSH'
+sudo ufw allow 5000/tcp comment 'WareHouseX REST API'
+sudo ufw allow 5173/tcp comment 'WareHouseX Vite Web UI'
+sudo ufw enable
+sudo ufw status verbose
+sudo /opt/warehousex/backup_warehouse.sh full
+tree ~/WareHouseX_Evidence

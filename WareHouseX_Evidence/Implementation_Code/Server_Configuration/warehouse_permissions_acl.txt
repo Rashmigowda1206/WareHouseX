@@ -1,0 +1,26 @@
+# file: /opt/warehousex
+# owner: root
+# group: warehouse_admin
+user::rwx
+group::r-x
+group:inventory:--x
+group:dispatch:--x
+mask::r-x
+other::---
+
+# file: /opt/warehousex/inventory
+# owner: root
+# group: inventory
+user::rwx
+group::r-x
+group:inventory:r-x
+mask::r-x
+other::---
+
+# file: /opt/warehousex/orders
+# owner: root
+# group: dispatch
+user::rwx
+group::r-x
+other::---
+

@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+
+# Node & Frontend
+node_modules/
+frontend/node_modules/
+frontend/dist/
+.npm
+.eslintcache
+
+# Environment & Secrets
+.env
+.env.local
+
+# Temp test files
+test_*.png
+test_*.py
+test_*.html
+generate_test.py
+test_render.py
+setup_evidence.py
+setup_server_config.py
+generate_all_screenshots.py
+UbuntuMono-*.ttf
+
+# OS / Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

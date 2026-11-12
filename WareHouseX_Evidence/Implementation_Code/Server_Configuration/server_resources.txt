@@ -1,0 +1,41 @@
+WAREHOUSEX SERVER RESOURCE INFORMATION
+======================================
+
+Disk Partitions:
+NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINTS
+loop0    7:0    0     4K  1 loop /snap/bare/5
+loop1    7:1    0  66.8M  1 loop /snap/core24/1643
+loop2    7:2    0    20M  1 loop /snap/desktop-security-center/151
+loop3    7:3    0  14.2M  1 loop /snap/desktop-security-center/206
+loop4    7:4    0 260.3M  1 loop /snap/firefox/8763
+loop5    7:5    0  16.5M  1 loop /snap/firmware-updater/226
+loop6    7:6    0 614.5M  1 loop /snap/gnome-46-2404/164
+loop7    7:7    0  91.7M  1 loop /snap/gtk-common-themes/1535
+loop8    7:8    0   1.5M  1 loop /snap/hwctl/123
+loop9    7:9    0   402M  1 loop /snap/mesa-2404/1839
+loop10   7:10   0   1.5M  1 loop /snap/hwctl/131
+loop11   7:11   0  18.8M  1 loop /snap/prompting-client/222
+loop12   7:12   0  18.4M  1 loop /snap/prompting-client/228
+loop13   7:13   0  50.1M  1 loop /snap/snapd/27710
+loop14   7:14   0  11.8M  1 loop /snap/snap-store/1390
+loop15   7:15   0   828K  1 loop /snap/snapd-desktop-integration/391
+sda      8:0    0  40.8G  0 disk 
+├─sda1   8:1    0     1M  0 part 
+└─sda2   8:2    0  40.8G  0 part /
+sr0     11:0    1  1024M  1 rom  
+
+Disk Space:
+Filesystem      Size  Used Avail Use% Mounted on
+tmpfs           680M  2.7M  678M   1% /run
+/dev/sda2        40G  8.3G   30G  22% /
+tmpfs           1.7G     0  1.7G   0% /dev/shm
+tmpfs           1.7G  3.3M  1.7G   1% /tmp
+none            1.0M     0  1.0M   0% /run/credentials/systemd-journald.service
+WareHouseX      476G  196G  281G  42% /media/sf_WareHouseX
+none            1.0M     0  1.0M   0% /run/credentials/systemd-resolved.service
+tmpfs           340M  116K  340M   1% /run/user/1000
+
+Memory Usage:
+               total        used        free      shared  buff/cache   available
+Mem:           3.3Gi       2.3Gi       155Mi        85Mi       1.0Gi       1.0Gi
+Swap:             0B          0B          0B

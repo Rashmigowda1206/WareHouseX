@@ -1,0 +1,195 @@
+import { apiRequest } from './api';
+import {
+  User,
+  InventoryItem,
+  InventorySummary,
+  StorageInfo,
+  BackupRecord,
+  BackupSchedule,
+  RecoveryHistoryItem,
+  SecurityAudit,
+  ActivityLog,
+  SystemMetrics,
+  SystemSettings
+} from '../types';
+
+// Auth Services
+export const authService = {
+  login: (credentials: { username: string; password: string }) =>
+    apiRequest<{ message: string; token: string; user: User }>('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify(credentials),
+    }),
+  getMe: () => apiRequest<{ user: User }>('/auth/me'),
+  logout: () => apiRequest<{ message: string }>('/auth/logout', { method: 'POST' }),
+};
+
+// Inventory Services
+export const inventoryService = {
+  getItems: (params?: { category?: string; status?: string; search?: string; sort_by?: string; sort_dir?: string }) => {
+    const searchParams = new URLSearchParams();
+    if (params?.category) searchParams.append('category', params.category);
+    if (params?.status) searchParams.append('status', params.status);
+    if (params?.search) searchParams.append('search', params.search);
+    if (params?.sort_by) searchParams.append('sort_by', params.sort_by);
+    if (params?.sort_dir) searchParams.append('sort_dir', params.sort_dir);
+    return apiRequest<{ items: InventoryItem[]; count: number }>(`/inventory?${searchParams.toString()}`);
+  },
+  getSummary: () => apiRequest<InventorySummary>('/inventory/summary'),
+  getCategories: () => apiRequest<{ categories: string[] }>('/inventory/categories'),
+  addProduct: (product: Partial<InventoryItem>) =>
+    apiRequest<{ message: string; id: number; product_id: string }>('/inventory', {
+      method: 'POST',
+      body: JSON.stringify(product),
+    }),
+  updateProduct: (id: number, product: Partial<InventoryItem>) =>
+    apiRequest<{ message: string }>(`/inventory/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(product),
+    }),
+  deleteProduct: (id: number) =>
+    apiRequest<{ message: string }>(`/inventory/${id}`, { method: 'DELETE' }),
+  adjustStock: (id: number, delta: number, reason: string) =>
+    apiRequest<{ message: string; new_quantity: number; stock_status: string }>(`/inventory/${id}/adjust-stock`, {
+      method: 'POST',
+      body: JSON.stringify({ delta, reason }),
+    }),
+  exportInventory: (format: 'csv' | 'json' = 'csv') =>
+    apiRequest<string>(`/inventory/export?format=${format}`),
+};
+
+// Employee Services
+export const employeeService = {
+  getEmployees: (params?: { role?: string; status?: string; search?: string }) => {
+    const searchParams = new URLSearchParams();
+    if (params?.role) searchParams.append('role', params.role);
+    if (params?.status) searchParams.append('status', params.status);
+    if (params?.search) searchParams.append('search', params.search);
+    return apiRequest<{ employees: User[]; linux_system_accounts: any[]; count: number }>(
+      `/employees?${searchParams.toString()}`
+    );
+  },
+  createEmployee: (employee: Partial<User> & { password: string; sync_linux?: boolean }) =>
+    apiRequest<{ message: string; employee_id: number; linux_sync: string }>('/employees', {
+      method: 'POST',
+      body: JSON.stringify(employee),
+    }),
+  updateEmployee: (id: number, employee: Partial<User> & { password?: string }) =>
+    apiRequest<{ message: string }>(`/employees/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(employee),
+    }),
+  deleteEmployee: (id: number) =>
+    apiRequest<{ message: string }>(`/employees/${id}`, { method: 'DELETE' }),
+};
+
+// Storage Services
+export const storageService = {
+  getOverview: () => apiRequest<StorageInfo>('/storage/overview'),
+  triggerCleanup: () =>
+    apiRequest<{ status: string; message: string; freed_space_mb: number }>('/storage/cleanup', {
+      method: 'POST',
+    }),
+};
+
+// Backup Services
+export const backupService = {
+  listBackups: () =>
+    apiRequest<{ backups: BackupRecord[]; schedules: BackupSchedule[]; count: number }>('/backups'),
+  createBackup: (backup_type: string, notes?: string) =>
+    apiRequest<{ message: string; backup: BackupRecord }>('/backups', {
+      method: 'POST',
+      body: JSON.stringify({ backup_type, notes }),
+    }),
+  verifyBackup: (id: number) =>
+    apiRequest<{ message: string; status: string; details: any }>(`/backups/${id}/verify`, {
+      method: 'POST',
+    }),
+  deleteBackup: (id: number) =>
+    apiRequest<{ message: string }>(`/backups/${id}`, { method: 'DELETE' }),
+  saveSchedule: (schedule: Partial<BackupSchedule>) =>
+    apiRequest<{ message: string }>('/backups/schedules', {
+      method: 'POST',
+      body: JSON.stringify(schedule),
+    }),
+  getBackupLogs: () =>
+    apiRequest<{ logs: { timestamp: string; level: string; message: string }[] }>('/backups/logs'),
+};
+
+// Recovery Services
+export const recoveryService = {
+  getAvailable: () => apiRequest<{ available_backups: BackupRecord[] }>('/recovery/available'),
+  preflightCheck: (filename: string) =>
+    apiRequest<{ status: string; archive: string; verification: any; requires_confirmation: boolean; confirmation_keyword: string }>(
+      `/recovery/preflight/${filename}`
+    ),
+  restoreBackup: (filename: string, confirmation_code: string, target_destination?: string) =>
+    apiRequest<{ message: string; details: any; files_restored: number }>('/recovery/restore', {
+      method: 'POST',
+      body: JSON.stringify({ filename, confirmation_code, target_destination }),
+    }),
+  getHistory: () => apiRequest<{ history: RecoveryHistoryItem[] }>('/recovery/history'),
+};
+
+// Monitoring Services
+export const monitoringService = {
+  getMetrics: () => apiRequest<SystemMetrics>('/monitoring/metrics'),
+  getHistory: () => apiRequest<{ history: any[] }>('/monitoring/history'),
+  getProcesses: () => apiRequest<{ processes: any[] }>('/monitoring/processes'),
+  manageService: (serviceName: string, action: 'status' | 'restart' | 'reload') =>
+    apiRequest<{ message: string; result: any }>(`/monitoring/service/${serviceName}/${action}`, {
+      method: 'POST',
+    }),
+};
+
+// Security Services
+export const securityService = {
+  getAudit: () => apiRequest<SecurityAudit>('/security/audit'),
+  addRule: (rule: { rule_name: string; port: number; protocol: string; action: string; source_ip?: string }) =>
+    apiRequest<{ message: string; rule_id: number }>('/security/rules', {
+      method: 'POST',
+      body: JSON.stringify(rule),
+    }),
+  deleteRule: (id: number) =>
+    apiRequest<{ message: string }>(`/security/rules/${id}`, { method: 'DELETE' }),
+  toggleUfw: (enable: boolean) =>
+    apiRequest<{ message: string; active: boolean }>('/security/toggle-ufw', {
+      method: 'POST',
+      body: JSON.stringify({ enable }),
+    }),
+  flushBans: () =>
+    apiRequest<{ message: string }>('/security/flush-bans', { method: 'POST' }),
+};
+
+// Activity Logs Services
+export const logsService = {
+  getLogs: (params?: { module?: string; severity?: string; search?: string; limit?: number }) => {
+    const searchParams = new URLSearchParams();
+    if (params?.module) searchParams.append('module', params.module);
+    if (params?.severity) searchParams.append('severity', params.severity);
+    if (params?.search) searchParams.append('search', params.search);
+    if (params?.limit) searchParams.append('limit', params.limit.toString());
+    return apiRequest<{ logs: ActivityLog[]; count: number }>(`/logs?${searchParams.toString()}`);
+  },
+  exportLogs: () => apiRequest<string>('/logs/export'),
+};
+
+// Settings Services
+export const settingsService = {
+  getSettings: () => apiRequest<SystemSettings>('/settings'),
+  updateSettings: (settings: Record<string, string>) =>
+    apiRequest<{ message: string }>('/settings', {
+      method: 'PUT',
+      body: JSON.stringify(settings),
+    }),
+  toggleMode: (mode: 'live' | 'demo' | 'auto') =>
+    apiRequest<{ message: string; current_mode: 'live' | 'demo'; is_live: boolean }>('/settings/mode', {
+      method: 'POST',
+      body: JSON.stringify({ mode }),
+    }),
+  updateProfile: (profile: { full_name?: string; email?: string; current_password?: string; new_password?: string }) =>
+    apiRequest<{ message: string }>('/settings/profile', {
+      method: 'PUT',
+      body: JSON.stringify(profile),
+    }),
+};

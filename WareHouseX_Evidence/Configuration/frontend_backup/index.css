@@ -1,0 +1,73 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-page: #F5F8EF;
+    --bg-card: #FFFFFF;
+    --bg-card-subtle: #FAFCF6;
+    --bg-mint: #DAE7C7;
+    --forest: #08482D;
+    --forest-hover: #063722;
+    --ink: #101410;
+    --subline: #5E5E61;
+    --border-light: rgba(8, 72, 45, 0.12);
+    --border-strong: rgba(8, 72, 45, 0.22);
+    color-scheme: light;
+  }
+
+  body {
+    background-color: var(--bg-page);
+    color: var(--ink);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    overflow-x: hidden;
+    margin: 0;
+  }
+
+  /* Custom Light Studio Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #EBEFE3;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #C4CEBA;
+    border-radius: 3px;
+    border: 1px solid rgba(8, 72, 45, 0.1);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--forest);
+  }
+}
+
+/* Light Studio & Soft Mint Glassmorphism */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(8, 72, 45, 0.12);
+}
+
+.glass-panel-hover {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.glass-panel-hover:hover {
+  border-color: rgba(8, 72, 45, 0.28);
+  box-shadow: 0 6px 24px -4px rgba(8, 72, 45, 0.08);
+}
+
+.font-heading {
+  font-family: 'Inter Tight', sans-serif;
+}
+
+.font-mono-tech {
+  font-family: 'JetBrains Mono', ui-monospace, Menlo, Monaco, Consolas, monospace;
+}
+
+/* Light theme input defaults */
+input, select, textarea {
+  font-family: 'Inter', sans-serif;
+}

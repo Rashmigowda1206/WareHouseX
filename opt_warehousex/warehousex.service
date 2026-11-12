@@ -1,0 +1,25 @@
+[Unit]
+Description=WareHouseX E-Commerce Warehouse & Linux Administration System
+After=network.target lvm2.service
+
+[Service]
+Type=simple
+User=rashmigowda
+Group=warehouse-admins
+WorkingDirectory=/home/rashmigowda/WareHouseX
+Environment="PYTHONUNBUFFERED=1"
+Environment="FLASK_ENV=production"
+ExecStart=/home/rashmigowda/WareHouseX/venv/bin/python3 /home/rashmigowda/WareHouseX/backend/app.py
+Restart=always
+RestartSec=5s
+LimitNOFILE=65535
+StandardOutput=append:/var/log/warehousex/systemd_stdout.log
+StandardError=append:/var/log/warehousex/systemd_stderr.log
+
+# Sandbox security hardening
+ProtectSystem=full
+ProtectHome=read-only
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,3 @@
+uid=1001(warehouse_manager) gid=1001(warehouse_admin) groups=1001(warehouse_admin),1002(inventory),1003(dispatch)
+uid=1002(inventory_staff) gid=1002(inventory) groups=1002(inventory)
+uid=1003(dispatch_staff) gid=1003(dispatch) groups=1003(dispatch)

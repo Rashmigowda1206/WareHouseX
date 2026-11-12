@@ -1,0 +1,24 @@
+WAREHOUSEX IMPLEMENTATION CODE INDEX
+====================================
+
+1. Application Source Code
+-rw-rw-r-- 1 rashmigowda rashmigowda 219K Nov 12 14:22 /home/rashmigowda/WareHouseX_Evidence/Implementation_Code/WareHouseX_Source_Code.tar.gz
+
+2. Linux Administration Scripts
+-rwxr-xr-x 1 rashmigowda rashmigowda  668 Nov 12 14:28 /home/rashmigowda/WareHouseX_Evidence/Implementation_Code/backup_warehouse.sh
+-rwxr-xr-x 1 rashmigowda rashmigowda  769 Nov 12 14:29 /home/rashmigowda/WareHouseX_Evidence/Implementation_Code/inventory_report.sh
+-rwxr-xr-x 1 rashmigowda rashmigowda 1003 Nov 12 14:29 /home/rashmigowda/WareHouseX_Evidence/Implementation_Code/system_monitor.sh
+
+3. Server Configuration
+total 32K
+-rw-rw-r-- 1 rashmigowda rashmigowda 1.1K Nov 12 14:36 root_crontab.txt
+-rw-rw-r-- 1 rashmigowda rashmigowda  669 Nov 12 14:42 server_information.txt
+-rw-rw-r-- 1 rashmigowda rashmigowda 1.9K Nov 12 14:46 server_resources.txt
+-rw-rw-r-- 1 rashmigowda rashmigowda  436 Nov 12 14:44 service_status.txt
+-rw-rw-r-- 1 rashmigowda rashmigowda  214 Nov 12 14:45 software_versions.txt
+-rw-rw-r-- 1 rashmigowda rashmigowda   93 Nov 12 14:38 warehouse_groups.txt
+-rw-rw-r-- 1 rashmigowda rashmigowda  371 Nov 12 14:36 warehouse_permissions_acl.txt
+-rw-rw-r-- 1 rashmigowda rashmigowda  249 Nov 12 14:41 warehouse_users.txt
+
+4. Linux Implementation Guide
+-rw-rw-r-- 1 rashmigowda rashmigowda 4.5K Nov 12 14:27 /home/rashmigowda/WareHouseX_Evidence/Implementation_Code/Linux_Implementation_Guide.md

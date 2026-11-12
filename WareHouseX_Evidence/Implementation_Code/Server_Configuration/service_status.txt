@@ -1,0 +1,13 @@
+WAREHOUSEX SERVICE STATUS
+=========================
+
+Cron Service:
+active
+
+Backend API Health:
+{"is_linux":true,"mode":"demo","service":"WareHouseX Enterprise API","status":"online","version":"2.4.0"}
+
+
+Listening Application Ports:
+LISTEN 0      128          0.0.0.0:5000      0.0.0.0:*    users:(("python",pid=22828,fd=3))          
+LISTEN 0      511          0.0.0.0:5173      0.0.0.0:*    users:(("node",pid=33332,fd=24))           

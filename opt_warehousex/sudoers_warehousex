@@ -1,0 +1,13 @@
+# /etc/sudoers.d/warehousex: Least-privilege delegation for WareHouseX
+# Members of warehouse-admins can run specific system administration utilities
+# without requiring full interactive root shell access.
+
+%warehouse-admins ALL=(ALL) NOPASSWD: /opt/warehousex/backup_warehouse.sh
+%warehouse-admins ALL=(ALL) NOPASSWD: /opt/warehousex/system_monitor.sh
+%warehouse-admins ALL=(ALL) NOPASSWD: /opt/warehousex/inventory_report.sh
+%warehouse-admins ALL=(ALL) NOPASSWD: /usr/sbin/service warehousex *
+%warehouse-admins ALL=(ALL) NOPASSWD: /bin/systemctl restart warehousex
+%warehouse-admins ALL=(ALL) NOPASSWD: /bin/systemctl reload warehousex
+%warehouse-admins ALL=(ALL) NOPASSWD: /bin/systemctl status warehousex
+%warehouse-admins ALL=(ALL) NOPASSWD: /usr/sbin/ufw status*
+%warehouse-admins ALL=(ALL) NOPASSWD: /usr/sbin/pvs, /usr/sbin/vgs, /usr/sbin/lvs

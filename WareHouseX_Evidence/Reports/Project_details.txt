@@ -1,0 +1,26 @@
+PROJECT IMPLEMENTATION DOSSIER: WAREHOUSEX
+==============================================================================
+Project Name:        WareHouseX: Intelligent E-Commerce Warehouse Management & Linux Server
+Tagline:             Secure. Automate. Monitor. Recover.
+Lead Administrator:  Rashmi Gowda (rashmigowda@Ubuntu-Linux-Admin)
+Target Environment:  Ubuntu 24.04 LTS (x86_64 Server Edition)
+Core Objective:      Centralized warehouse logistics platform integrated directly with
+                     Ubuntu Linux server administration (LVM, systemd, cron, TAR, UFW, SSH).
+
+DEPLOYMENT TOPOLOGY:
+- Application Directory:      /home/rashmigowda/WareHouseX
+- Production Scripts & Bin:   /opt/warehousex
+- Backup Storage Vault:       /var/backups/warehousex
+- Log Journals:               /var/log/warehousex
+- Systemd Daemon Unit:        /etc/systemd/system/warehousex.service
+- Cron Automation Schedule:   /etc/cron.d/warehousex-backup
+- Firewall Framework:         Ubuntu Uncomplicated Firewall (UFW)
+- Monolithic Storage Layer:   LVM2 Volume Group (vg_warehousex) with Ext4 Partitions
+
+SECURITY & ROLE-BASED ACCESS CONTROLS:
+- Administrators Group:       warehouse-admins (UID/GID privileged Linux group)
+- Operations Staff Group:     warehouse-staff (Restricted to inventory catalog)
+- Sudoers Configuration:      /etc/sudoers.d/warehousex (Restricted command allowlist)
+- OpenSSH Hardening:          Port 22, PermitRootLogin no, PasswordAuthentication no
+- Two-Stage Restore Protocol: Explicit confirmation keyword ("RESTORE") before overwrite
+==============================================================================
