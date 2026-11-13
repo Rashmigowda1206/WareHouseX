@@ -34,15 +34,20 @@ export async function apiRequest<T>(
       return (await response.text()) as unknown as T;
     }
 
-    const contentType = response.headers.get('content-type') || '';
-    if (!contentType.includes('application/json')) {
+    const text = await response.text();
+    if (!text || text.trim() === '') {
       return await handleMockRequest<T>(endpoint, options);
     }
 
-    const data = await response.json();
+    let data: any;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      return await handleMockRequest<T>(endpoint, options);
+    }
 
     if (!response.ok) {
-      if (response.status === 404 || response.status === 502 || response.status === 503) {
+      if (response.status === 404 || response.status === 502 || response.status === 503 || response.status === 504) {
         return await handleMockRequest<T>(endpoint, options);
       }
       throw new Error(data.error || data.message || `Request failed with code ${response.status}`);
