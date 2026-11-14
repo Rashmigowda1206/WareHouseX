@@ -739,11 +739,11 @@ html_content = f"""<!DOCTYPE html>
           <div class="uni-logo-mark">AU</div>
           <div class="uni-text">
             <h3>Alliance University • School of Advanced Computing</h3>
-            <p>Department of Computer Science and Engineering | IT (AR/VR Specialization)</p>
+            <p>Department of Information Technology</p>
           </div>
         </div>
         <div class="course-badge">
-          COURSE: E1ITA306 DESIGN PROJECT - 1 (2026)
+          COURSE: LINUX SYSTEM ADMINISTRATION
         </div>
       </div>
 
@@ -763,7 +763,7 @@ html_content = f"""<!DOCTYPE html>
         <div class="presenters-card">
           <div class="presenters-header">
             <span>Project Team Members (Presenters)</span>
-            <span>Specialization: IT (AR/VR)</span>
+            <span>Department of Information Technology</span>
           </div>
           <div class="team-grid">
             <div class="team-member">
@@ -1187,7 +1187,7 @@ html_content = f"""<!DOCTYPE html>
         <span>•</span>
         <span>Alliance University, Bengaluru, India</span>
         <span>•</span>
-        <span>Design Project - 1 Review 2026</span>
+        <span>Linux System Administration Project Review 2026</span>
       </div>
       <div class="footer-links">
         <span>GitHub: <a href="https://github.com/Rashmigowda1206/WareHouseX" target="_blank">github.com/Rashmigowda1206/WareHouseX</a></span>
