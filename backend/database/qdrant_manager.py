@@ -7,6 +7,7 @@ and duplicate prevention for warehouse inventory items.
 import os
 import uuid
 import logging
+import threading
 from datetime import datetime, timezone
 from typing import Dict, Any, List, Optional, Tuple
 
@@ -59,6 +60,7 @@ class ItemNotFoundError(Exception):
 class QdrantManager:
     _instance = None
     _client: Optional[QdrantClient] = None
+    _write_lock = threading.RLock()
 
     def __new__(cls):
         if cls._instance is None:
@@ -147,6 +149,7 @@ class QdrantManager:
         """
         Adds a new inventory item to Qdrant:
         - Validates unique item_id (enforcing duplicate prevention)
+        - Thread-safe synchronization ensures race-free duplicate checking
         - Computes embedding vector using name, category, description
         - Stores vector and structured payload in Qdrant
         """
@@ -158,75 +161,76 @@ class QdrantManager:
         if not item_name:
             raise ValueError("item_name is required.")
 
-        # Duplicate check by item_id
-        point_id = item_id_to_uuid(raw_id)
-        existing = self.get_item(raw_id)
-        if existing:
-            raise DuplicateItemError(f"Inventory item with item_id '{raw_id}' already exists in Qdrant.")
+        with self._write_lock:
+            # Duplicate check by item_id
+            point_id = item_id_to_uuid(raw_id)
+            existing = self.get_item(raw_id)
+            if existing:
+                raise DuplicateItemError(f"Inventory item with item_id '{raw_id}' already exists in Qdrant.")
 
-        category = str(item_data.get("category", "General")).strip()
-        description = str(item_data.get("description", "")).strip() or f"{item_name} inventory asset"
-        sku = str(item_data.get("SKU") or item_data.get("sku") or f"SKU-{raw_id}").strip().upper()
-        barcode = str(item_data.get("barcode", "")).strip() or f"890{abs(hash(raw_id)) % 10000000000:010d}"
-        quantity = int(item_data.get("quantity", 0))
-        minimum_stock = int(item_data.get("minimum_stock") or item_data.get("reorder_point", 10))
-        unit_price = float(item_data.get("unit_price", 0.0))
-        supplier = str(item_data.get("supplier", "Unknown")).strip()
-        warehouse_location = str(item_data.get("warehouse_location") or item_data.get("location_zone", "Zone A-01-A")).strip()
-        
-        now_iso = datetime.now(timezone.utc).isoformat()
-        date_added = item_data.get("date_added", now_iso)
-        last_updated = now_iso
-        status = item_data.get("status") or compute_stock_status(quantity, minimum_stock)
+            category = str(item_data.get("category", "General")).strip()
+            description = str(item_data.get("description", "")).strip() or f"{item_name} inventory asset"
+            sku = str(item_data.get("SKU") or item_data.get("sku") or f"SKU-{raw_id}").strip().upper()
+            barcode = str(item_data.get("barcode", "")).strip() or f"890{abs(hash(raw_id)) % 10000000000:010d}"
+            quantity = int(item_data.get("quantity", 0))
+            minimum_stock = int(item_data.get("minimum_stock") or item_data.get("reorder_point", 10))
+            unit_price = float(item_data.get("unit_price", 0.0))
+            supplier = str(item_data.get("supplier", "Unknown")).strip()
+            warehouse_location = str(item_data.get("warehouse_location") or item_data.get("location_zone", "Zone A-01-A")).strip()
+            
+            now_iso = datetime.now(timezone.utc).isoformat()
+            date_added = item_data.get("date_added", now_iso)
+            last_updated = now_iso
+            status = item_data.get("status") or compute_stock_status(quantity, minimum_stock)
 
-        # Generate embedding vector
-        embed_text = embedding_service.construct_item_text(
-            name=item_name,
-            category=category,
-            description=description,
-            sku=sku,
-            location=warehouse_location
-        )
-        vector = embedding_service.embed_text(embed_text)
+            # Generate embedding vector
+            embed_text = embedding_service.construct_item_text(
+                name=item_name,
+                category=category,
+                description=description,
+                sku=sku,
+                location=warehouse_location
+            )
+            vector = embedding_service.embed_text(embed_text)
 
-        payload = {
-            "item_id": raw_id,
-            "item_name": item_name,
-            "SKU": sku,
-            "barcode": barcode,
-            "category": category,
-            "description": description,
-            "quantity": quantity,
-            "minimum_stock": minimum_stock,
-            "unit_price": round(unit_price, 2),
-            "supplier": supplier,
-            "warehouse_location": warehouse_location,
-            "date_added": date_added,
-            "last_updated": last_updated,
-            "status": status,
-            # Legacy backward-compatibility aliases
-            "product_id": raw_id,
-            "name": item_name,
-            "sku": sku,
-            "location_zone": warehouse_location,
-            "reorder_point": minimum_stock,
-            "stock_status": status,
-        }
+            payload = {
+                "item_id": raw_id,
+                "item_name": item_name,
+                "SKU": sku,
+                "barcode": barcode,
+                "category": category,
+                "description": description,
+                "quantity": quantity,
+                "minimum_stock": minimum_stock,
+                "unit_price": round(unit_price, 2),
+                "supplier": supplier,
+                "warehouse_location": warehouse_location,
+                "date_added": date_added,
+                "last_updated": last_updated,
+                "status": status,
+                # Legacy backward-compatibility aliases
+                "product_id": raw_id,
+                "name": item_name,
+                "sku": sku,
+                "location_zone": warehouse_location,
+                "reorder_point": minimum_stock,
+                "stock_status": status,
+            }
 
-        point = PointStruct(
-            id=point_id,
-            vector=vector,
-            payload=payload,
-        )
+            point = PointStruct(
+                id=point_id,
+                vector=vector,
+                payload=payload,
+            )
 
-        self.client.upsert(
-            collection_name=QDRANT_COLLECTION_NAME,
-            points=[point],
-            wait=True,
-        )
+            self.client.upsert(
+                collection_name=QDRANT_COLLECTION_NAME,
+                points=[point],
+                wait=True,
+            )
 
-        logger.info(f"[✓] Item added to Qdrant: {raw_id} ('{item_name}')")
-        return payload
+            logger.info(f"[✓] Item added to Qdrant: {raw_id} ('{item_name}')")
+            return payload
 
     def get_item(self, item_id: str) -> Optional[Dict[str, Any]]:
         """

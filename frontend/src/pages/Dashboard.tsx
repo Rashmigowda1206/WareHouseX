@@ -906,7 +906,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateTab }) => {
               </div>
               <div className="flex justify-between py-1 border-b border-[#08482D]/5">
                 <span className="text-[#5E5E61]">Snapshot Encryption</span>
-                <span className="font-bold text-[#101410]">AES-256 (Fernet)</span>
+                <span className="font-bold text-[#101410]">Fernet (AES-128-CBC + HMAC)</span>
               </div>
               <div className="flex justify-between py-1 border-b border-[#08482D]/5">
                 <span className="text-[#5E5E61]">Integrity Verification</span>

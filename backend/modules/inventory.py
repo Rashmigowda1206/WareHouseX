@@ -104,7 +104,7 @@ def get_categories():
 
 @inventory_bp.route("", methods=["POST"])
 @token_required
-@role_required(["admin", "manager", "owner", "OWNER", "WAREHOUSE_MANAGER"])
+@role_required(["admin", "manager", "owner", "OWNER", "WAREHOUSE_MANAGER", "INVENTORY_STAFF"])
 def add_product():
     """
     Adds a new item into Qdrant:
@@ -153,7 +153,7 @@ def add_product():
 
 @inventory_bp.route("/<path:item_id>", methods=["PUT"])
 @token_required
-@role_required(["admin", "manager", "owner", "OWNER", "WAREHOUSE_MANAGER"])
+@role_required(["admin", "manager", "owner", "OWNER", "WAREHOUSE_MANAGER", "INVENTORY_STAFF"])
 def update_product(item_id: str):
     """
     Updates an existing inventory item in Qdrant.
@@ -269,6 +269,7 @@ def delete_product(item_id: str):
 
 @inventory_bp.route("/export", methods=["GET"])
 @token_required
+@role_required(["admin", "owner", "OWNER", "manager", "WAREHOUSE_MANAGER"])
 def export_inventory():
     """
     Exports all Qdrant inventory records as CSV or JSON.

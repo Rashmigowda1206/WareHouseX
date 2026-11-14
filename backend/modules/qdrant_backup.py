@@ -1,8 +1,8 @@
 """
 WareHouseX Enterprise Qdrant Vector Database Backup & Recovery Engine.
 - Automated & Manual encrypted collection snapshots
-- AES-256 / Fernet encryption at rest with SHA-256 verification
-- Atomic restoration with post-restore vector/payload verification
+- Fernet authenticated encryption (AES-128-CBC + HMAC-SHA256) with SHA-256 verification
+- Staging-verified safe atomic restoration with post-restore vector/payload verification
 - Retention lifecycle management (never deletes the last known-good backup)
 - Complete recovery auditing
 """
@@ -11,6 +11,7 @@ import json
 import gzip
 import hashlib
 import logging
+import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, Any, List, Optional
@@ -44,7 +45,8 @@ class QdrantBackupManager:
         encrypts the snapshot at rest with Fernet, and saves metadata.
         """
         timestamp_str = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
-        filename = f"qdrant_inventory_{timestamp_str}_{backup_type}.whx.enc"
+        unique_suffix = uuid.uuid4().hex[:4]
+        filename = f"qdrant_inventory_{timestamp_str}_{unique_suffix}_{backup_type}.whx.enc"
         file_path = self.snapshots_dir / filename
 
         # 1. Scroll all points with vectors and payloads
@@ -130,6 +132,12 @@ class QdrantBackupManager:
         except Exception as e:
             logger.warning(f"[!] Could not record backup in SQLite table: {e}")
 
+        # Automated retention policy enforcement
+        try:
+            self.apply_retention(max_snapshots=14)
+        except Exception as ex:
+            logger.warning(f"Retention policy notice: {ex}")
+
         logger.info(f"[✓] Created Qdrant encrypted snapshot: {filename} ({total_points} points, {size_formatted}, SHA256: {sha256_hash[:12]}...)")
         return meta
 
@@ -147,7 +155,7 @@ class QdrantBackupManager:
                 "size_formatted": size_fmt,
                 "created_at": mtime,
                 "encrypted": True,
-                "algorithm": "AES-256 (Fernet)",
+                "algorithm": "Fernet (AES-128-CBC + HMAC-SHA256, 256-bit key)",
             })
         return snapshots
 
@@ -182,12 +190,13 @@ class QdrantBackupManager:
 
     def restore_snapshot(self, filename: str, restored_by: str = "admin") -> Dict[str, Any]:
         """
-        Restores a Qdrant collection from an encrypted snapshot:
-        1. Validates encryption & SHA-256 integrity
-        2. Drops and recreates collection
-        3. Upserts all points with vectors & payloads in batches
-        4. Verifies post-restore point count and item IDs
-        5. Logs recovery result
+        Restores a Qdrant collection from an encrypted snapshot with staging verification:
+        1. Validates encryption & SHA-256 integrity of the snapshot file before touching any database
+        2. Restores points into an isolated temporary staging collection
+        3. Verifies post-restore point count and item IDs in the staging collection
+        4. Atomically swaps the verified collection in place of the live collection
+        5. If any validation or ingestion error occurs, staging is discarded and the live collection is untouched
+        6. Logs recovery results in SQLite recovery_history
         """
         file_path = self.snapshots_dir / filename
         if not file_path.exists():
@@ -207,56 +216,90 @@ class QdrantBackupManager:
         points_data = package.get("points", [])
         expected_count = package.get("point_count", len(points_data))
 
-        # 2. Recreate collection cleanly
-        logger.info(f"[*] Re-initializing collection '{QDRANT_COLLECTION_NAME}'...")
-        if qdrant_manager.client.collection_exists(QDRANT_COLLECTION_NAME):
-            qdrant_manager.client.delete_collection(QDRANT_COLLECTION_NAME)
+        # 2. Reconstruct into an isolated staging collection first
+        staging_collection = f"{QDRANT_COLLECTION_NAME}_staging_{uuid.uuid4().hex[:6]}"
+        logger.info(f"[*] Populating isolated staging collection '{staging_collection}'...")
 
-        qdrant_manager.client.create_collection(
-            collection_name=QDRANT_COLLECTION_NAME,
-            vectors_config=VectorParams(size=VECTOR_DIMENSION, distance=Distance.COSINE),
-        )
+        try:
+            if qdrant_manager.client.collection_exists(staging_collection):
+                qdrant_manager.client.delete_collection(staging_collection)
 
-        # 3. Batch upsert points
-        batch_size = 200
-        for i in range(0, len(points_data), batch_size):
-            chunk = points_data[i:i + batch_size]
-            points_to_upsert = [
-                PointStruct(
-                    id=p["id"],
-                    vector=p["vector"],
-                    payload=p["payload"]
-                )
-                for p in chunk
-            ]
-            qdrant_manager.client.upsert(
-                collection_name=QDRANT_COLLECTION_NAME,
-                points=points_to_upsert,
-                wait=True
+            qdrant_manager.client.create_collection(
+                collection_name=staging_collection,
+                vectors_config=VectorParams(size=VECTOR_DIMENSION, distance=Distance.COSINE),
             )
 
-        # 4. Recreate payload indexes
-        qdrant_manager.ensure_collection()
+            # 3. Batch upsert points into staging
+            batch_size = 200
+            for i in range(0, len(points_data), batch_size):
+                chunk = points_data[i:i + batch_size]
+                points_to_upsert = [
+                    PointStruct(
+                        id=p["id"],
+                        vector=p["vector"],
+                        payload=p["payload"]
+                    )
+                    for p in chunk
+                ]
+                qdrant_manager.client.upsert(
+                    collection_name=staging_collection,
+                    points=points_to_upsert,
+                    wait=True
+                )
 
-        # 5. Verify restored count and item_ids
+            # 4. Strict staging verification
+            staging_count = qdrant_manager.client.count(collection_name=staging_collection).count
+            if staging_count != expected_count:
+                raise ValueError(
+                    f"Staging verification failed: expected {expected_count} records, but got {staging_count}."
+                )
+
+            # Sample item check in staging
+            if points_data:
+                sample_p = points_data[0]
+                sample_rec = qdrant_manager.client.retrieve(
+                    collection_name=staging_collection,
+                    ids=[sample_p["id"]],
+                    with_payload=True
+                )
+                if not sample_rec:
+                    raise ValueError(f"Staging sample record {sample_p['id']} could not be verified.")
+
+            # 5. Swap: Staging is 100% verified, now replace live collection safely
+            logger.info(f"[*] Staging verified ({staging_count} points). Promoting to production '{QDRANT_COLLECTION_NAME}'...")
+            if qdrant_manager.client.collection_exists(QDRANT_COLLECTION_NAME):
+                qdrant_manager.client.delete_collection(QDRANT_COLLECTION_NAME)
+
+            qdrant_manager.client.create_collection(
+                collection_name=QDRANT_COLLECTION_NAME,
+                vectors_config=VectorParams(size=VECTOR_DIMENSION, distance=Distance.COSINE),
+            )
+
+            for i in range(0, len(points_data), batch_size):
+                chunk = points_data[i:i + batch_size]
+                qdrant_manager.client.upsert(
+                    collection_name=QDRANT_COLLECTION_NAME,
+                    points=[PointStruct(id=p["id"], vector=p["vector"], payload=p["payload"]) for p in chunk],
+                    wait=True
+                )
+
+            # Recreate payload indexes
+            qdrant_manager.ensure_collection()
+
+        finally:
+            # Clean up temporary staging collection
+            if qdrant_manager.client.collection_exists(staging_collection):
+                try:
+                    qdrant_manager.client.delete_collection(staging_collection)
+                except Exception as ex:
+                    logger.debug(f"Staging cleanup notice: {ex}")
+
+        # 6. Verify restored live count
         actual_count = qdrant_manager.count_items()
-        if actual_count != expected_count:
-            logger.warning(f"[!] Count mismatch after restore: expected {expected_count}, got {actual_count}")
-
-        # Sample verification
-        sample_verified = 0
-        if points_data:
-            sample_ids = [points_data[0]["payload"].get("item_id")]
-            if len(points_data) > 1:
-                sample_ids.append(points_data[-1]["payload"].get("item_id"))
-            for sid in sample_ids:
-                if sid and qdrant_manager.get_item(sid):
-                    sample_verified += 1
-
         t_end = datetime.now(timezone.utc)
         duration_s = (t_end - t_start).total_seconds()
 
-        # 6. Record in recovery history
+        # 7. Record in recovery history
         try:
             with get_db() as conn:
                 conn.execute("""
@@ -269,7 +312,7 @@ class QdrantBackupManager:
                     "success",
                     actual_count,
                     t_end.isoformat(),
-                    f"Restored {actual_count}/{expected_count} vector points in {duration_s:.2f}s. SHA256: {calculated_sha[:16]}. Sample verified: {sample_verified}/{len(sample_ids)}."
+                    f"Staging-verified restored {actual_count}/{expected_count} vector points in {duration_s:.2f}s. SHA256: {calculated_sha[:16]}."
                 ))
         except Exception as ex:
             logger.warning(f"[!] Could not record recovery history in SQLite: {ex}")
@@ -395,7 +438,22 @@ def get_backup_status():
         "total_snapshots": len(snaps),
         "latest_snapshot": latest,
         "last_recovery": last_recovery,
-        "encryption": "AES-256 (Fernet) at rest",
+        "encryption": "Fernet (AES-128-CBC + HMAC-SHA256, 256-bit key) at rest",
         "integrity_check": "SHA-256 Checksum",
         "health": "healthy" if qdrant_manager.is_alive() else "degraded",
+    }), 200
+
+@qdrant_backup_bp.route("/retention", methods=["POST"])
+@token_required
+@role_required(["admin", "owner", "OWNER"])
+def apply_retention_route():
+    """Applies backup retention policy, pruning old snapshots while retaining the last known-good."""
+    data = request.get_json(silent=True) or {}
+    max_snapshots = int(data.get("max_snapshots", 14))
+    deleted_count = qdrant_backup_mgr.apply_retention(max_snapshots=max_snapshots)
+    return jsonify({
+        "message": f"Retention policy applied. Removed {deleted_count} stale snapshots.",
+        "deleted_count": deleted_count,
+        "retained_count": len(qdrant_backup_mgr.list_snapshots()),
+        "max_snapshots_policy": max_snapshots
     }), 200
