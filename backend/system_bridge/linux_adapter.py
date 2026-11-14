@@ -125,6 +125,36 @@ class LinuxAdapter:
             "message": f"Linux user {username} safely removed (Simulated)"
         }
 
+    def lock_linux_user(self, username: str) -> dict:
+        if not validate_username(username):
+            raise ValueError(f"Invalid username: '{username}'")
+        res = self._run_script("user_management.sh", ["lock", username])
+        if res:
+            return res
+        return self.emulator.lock_linux_user(username)
+
+    def unlock_linux_user(self, username: str) -> dict:
+        if not validate_username(username):
+            raise ValueError(f"Invalid username: '{username}'")
+        res = self._run_script("user_management.sh", ["unlock", username])
+        if res:
+            return res
+        return self.emulator.unlock_linux_user(username)
+
+    def change_linux_user_shell(self, username: str, shell: str = "/bin/bash") -> dict:
+        if not validate_username(username):
+            raise ValueError(f"Invalid username: '{username}'")
+        res = self._run_script("user_management.sh", ["shell", username, shell])
+        if res:
+            return res
+        return self.emulator.change_linux_user_shell(username, shell)
+
+    def get_linux_groups(self) -> dict:
+        res = self._run_script("user_management.sh", ["groups"])
+        if res:
+            return res
+        return self.emulator.get_linux_groups()
+
     # 5. Service Control
     def control_service(self, service: str, action: str = "status") -> dict:
         if not validate_service_name(service):

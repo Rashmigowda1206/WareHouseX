@@ -196,3 +196,80 @@ def delete_employee(emp_id: int):
         )
 
     return jsonify({"message": f"Employee {emp['username']} successfully removed"}), 200
+
+# ==============================================================================
+# LINUX SYSTEM USER & ACCESS CONTROL ENDPOINTS
+# ==============================================================================
+
+@employees_bp.route("/linux/users", methods=["GET"])
+@token_required
+def get_linux_users():
+    """Retrieve POSIX system accounts from Ubuntu /etc/passwd or emulator."""
+    res = get_adapter().get_linux_users()
+    return jsonify(res), 200
+
+@employees_bp.route("/linux/groups", methods=["GET"])
+@token_required
+def get_linux_groups():
+    """Retrieve POSIX security groups and memberships from Ubuntu /etc/group."""
+    res = get_adapter().get_linux_groups()
+    return jsonify(res), 200
+
+@employees_bp.route("/linux/user/<username>/lock", methods=["POST"])
+@token_required
+@role_required(["admin"])
+def lock_linux_user(username: str):
+    """Lock Linux account via usermod -L and disable shell."""
+    client_ip = request.remote_addr or "127.0.0.1"
+    res = get_adapter().lock_linux_user(username)
+
+    # Sync corresponding DB user status if present
+    with get_db() as conn:
+        conn.execute("UPDATE users SET status = 'suspended' WHERE linux_user = ?", (username,))
+        conn.execute(
+            "INSERT INTO activity_logs (user_id, username, action, module, details, severity, ip_address) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            (g.current_user["user_id"], g.current_user["username"], "LINUX_USER_LOCKED", "system", f"Locked Linux account {username} (usermod -L)", "warning", client_ip)
+        )
+
+    return jsonify(res), 200
+
+@employees_bp.route("/linux/user/<username>/unlock", methods=["POST"])
+@token_required
+@role_required(["admin"])
+def unlock_linux_user(username: str):
+    """Unlock Linux account via usermod -U and restore shell access."""
+    client_ip = request.remote_addr or "127.0.0.1"
+    res = get_adapter().unlock_linux_user(username)
+
+    with get_db() as conn:
+        conn.execute("UPDATE users SET status = 'active' WHERE linux_user = ?", (username,))
+        conn.execute(
+            "INSERT INTO activity_logs (user_id, username, action, module, details, severity, ip_address) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            (g.current_user["user_id"], g.current_user["username"], "LINUX_USER_UNLOCKED", "system", f"Unlocked Linux account {username} (usermod -U)", "info", client_ip)
+        )
+
+    return jsonify(res), 200
+
+@employees_bp.route("/linux/user/<username>/shell", methods=["POST"])
+@token_required
+@role_required(["admin"])
+def change_linux_user_shell(username: str):
+    """Change Linux user login shell (/bin/bash or /usr/sbin/nologin)."""
+    data = request.get_json(silent=True) or {}
+    shell = data.get("shell", "/bin/bash").strip()
+    client_ip = request.remote_addr or "127.0.0.1"
+
+    if shell not in ("/bin/bash", "/bin/sh", "/usr/sbin/nologin", "/bin/false"):
+        return jsonify({"error": "Invalid shell specification"}), 400
+
+    res = get_adapter().change_linux_user_shell(username, shell)
+
+    with get_db() as conn:
+        new_status = 'suspended' if shell in ("/usr/sbin/nologin", "/bin/false") else 'active'
+        conn.execute("UPDATE users SET status = ? WHERE linux_user = ?", (new_status, username))
+        conn.execute(
+            "INSERT INTO activity_logs (user_id, username, action, module, details, severity, ip_address) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            (g.current_user["user_id"], g.current_user["username"], "LINUX_SHELL_CHANGED", "system", f"Updated login shell for {username} to {shell}", "info", client_ip)
+        )
+
+    return jsonify(res), 200

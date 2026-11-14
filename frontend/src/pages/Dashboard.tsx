@@ -868,6 +868,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateTab }) => {
         <div className="lg:col-span-2">
           <InventoryCategoryChart
             data={summary?.categories || []}
+            totalValue={summary?.total_value}
+            totalSkus={summary?.total_products}
+            lowStockCount={summary?.low_stock_count}
+            outOfStockCount={summary?.out_of_stock_count}
+            onManageCatalog={() => onNavigateTab('inventory')}
           />
         </div>
 

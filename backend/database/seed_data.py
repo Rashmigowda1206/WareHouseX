@@ -21,9 +21,16 @@ def seed_database():
             ("admin", generate_password_hash("admin123"), "Alexander Hayes", "admin@warehousex.internal", "admin", "whx_admin", "wh-admins", "active"),
             ("manager", generate_password_hash("manager123"), "Elena Rostova", "manager@warehousex.internal", "manager", "whx_manager", "wh-managers", "active"),
             ("staff", generate_password_hash("staff123"), "Devon Vance", "staff@warehousex.internal", "staff", "whx_staff01", "wh-staff", "active"),
+            ("rashmi", generate_password_hash("rashmi123"), "Rashmi", "rashmi@warehousex.internal", "admin", "whx_rashmi", "wh-admins", "active"),
+            ("panchak", generate_password_hash("panchak123"), "Panchaksharayya", "panchak@warehousex.internal", "admin", "whx_panchak", "wh-admins", "active"),
+            ("darshan", generate_password_hash("darshan123"), "S Darshan Sai", "darshan@warehousex.internal", "manager", "whx_darshan", "wh-managers", "active"),
+            ("apoorva", generate_password_hash("apoorva123"), "Apoorva P Keretot", "apoorva@warehousex.internal", "manager", "whx_apoorva", "wh-managers", "active"),
             ("dkalu", generate_password_hash("staff123"), "David Kalu", "d.kalu@warehousex.internal", "staff", "whx_staff02", "wh-staff", "active"),
             ("schen", generate_password_hash("staff123"), "Sarah Chen", "s.chen@warehousex.internal", "manager", "whx_leadsec", "wh-admins", "active"),
             ("ppatel", generate_password_hash("staff123"), "Priya Patel", "p.patel@warehousex.internal", "staff", "whx_staff03", "wh-staff", "active"),
+            ("kpatel", generate_password_hash("staff123"), "Kiran Patel", "k.patel@warehousex.internal", "staff", "whx_kpatel", "wh-staff", "active"),
+            ("rjohnson", generate_password_hash("staff123"), "Robert Johnson", "r.johnson@warehousex.internal", "staff", "whx_rjohnson", "wh-staff", "active"),
+            ("amendoza", generate_password_hash("staff123"), "Anita Mendoza", "a.mendoza@warehousex.internal", "staff", "whx_amendoza", "wh-staff", "active"),
             ("mross", generate_password_hash("staff123"), "Marcus Ross", "m.ross@warehousex.internal", "staff", "whx_staff04", "wh-staff", "inactive")
         ]
 

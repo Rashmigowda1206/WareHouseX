@@ -10,6 +10,28 @@ class LinuxEmulator:
     """
     def __init__(self):
         self._start_time = time.time() - (14 * 86400 + 7 * 3600 + 42 * 60) # ~14 days uptime
+        self._users = [
+            {"username": "whx_admin", "uid": 1001, "gid": 1001, "home": "/home/whx_admin", "shell": "/bin/bash", "groups": "wh-admins sudo", "status": "active"},
+            {"username": "whx_manager", "uid": 1002, "gid": 1002, "home": "/home/whx_manager", "shell": "/bin/bash", "groups": "wh-managers", "status": "active"},
+            {"username": "whx_staff01", "uid": 1003, "gid": 1003, "home": "/home/whx_staff01", "shell": "/bin/bash", "groups": "wh-staff", "status": "active"},
+            {"username": "whx_staff02", "uid": 1004, "gid": 1004, "home": "/home/whx_staff02", "shell": "/bin/bash", "groups": "wh-staff", "status": "active"},
+            {"username": "whx_leadsec", "uid": 1005, "gid": 1005, "home": "/home/whx_leadsec", "shell": "/bin/bash", "groups": "wh-admins", "status": "active"},
+            {"username": "whx_rashmi", "uid": 1006, "gid": 1001, "home": "/home/whx_rashmi", "shell": "/bin/bash", "groups": "wh-admins sudo", "status": "active"},
+            {"username": "whx_panchak", "uid": 1007, "gid": 1001, "home": "/home/whx_panchak", "shell": "/bin/bash", "groups": "wh-admins sudo", "status": "active"},
+            {"username": "whx_darshan", "uid": 1008, "gid": 1002, "home": "/home/whx_darshan", "shell": "/bin/bash", "groups": "wh-managers", "status": "active"},
+            {"username": "whx_apoorva", "uid": 1009, "gid": 1002, "home": "/home/whx_apoorva", "shell": "/bin/bash", "groups": "wh-managers backup-operators", "status": "active"},
+            {"username": "whx_kpatel", "uid": 1010, "gid": 1003, "home": "/home/whx_kpatel", "shell": "/bin/bash", "groups": "wh-staff", "status": "active"},
+            {"username": "whx_rjohnson", "uid": 1011, "gid": 1003, "home": "/home/whx_rjohnson", "shell": "/bin/bash", "groups": "wh-staff", "status": "active"},
+            {"username": "whx_amendoza", "uid": 1012, "gid": 1003, "home": "/home/whx_amendoza", "shell": "/bin/bash", "groups": "wh-staff", "status": "active"},
+            {"username": "whx_staff04", "uid": 1013, "gid": 1003, "home": "/home/whx_staff04", "shell": "/usr/sbin/nologin", "groups": "wh-staff", "status": "locked"}
+        ]
+        self._groups = [
+            {"name": "wh-admins", "gid": 1001, "description": "Full administrative Linux & storage access", "members": ["whx_admin", "whx_leadsec", "whx_rashmi", "whx_panchak"]},
+            {"name": "wh-managers", "gid": 1002, "description": "Warehouse operational management and inventory control", "members": ["whx_manager", "whx_darshan", "whx_apoorva"]},
+            {"name": "wh-staff", "gid": 1003, "description": "Standard inventory cycle counting & fulfillment floor operators", "members": ["whx_staff01", "whx_staff02", "whx_kpatel", "whx_rjohnson", "whx_amendoza"]},
+            {"name": "backup-operators", "gid": 1004, "description": "Disaster recovery, LVM snapshot & backup privileges", "members": ["whx_admin", "whx_apoorva"]},
+            {"name": "sudo", "gid": 27, "description": "Elevated POSIX sudoers capability", "members": ["whx_admin", "whx_rashmi", "whx_panchak"]}
+        ]
 
     def get_system_metrics(self):
         elapsed = time.time() - self._start_time
@@ -146,12 +168,65 @@ class LinuxEmulator:
     def get_linux_users(self):
         return {
             "mode": "simulated",
-            "users": [
-                {"username": "whx_admin", "uid": 1001, "gid": 1001, "home": "/home/whx_admin", "shell": "/bin/bash", "groups": "wh-admins sudo", "status": "active"},
-                {"username": "whx_manager", "uid": 1002, "gid": 1002, "home": "/home/whx_manager", "shell": "/bin/bash", "groups": "wh-managers", "status": "active"},
-                {"username": "whx_staff01", "uid": 1003, "gid": 1003, "home": "/home/whx_staff01", "shell": "/bin/bash", "groups": "wh-staff", "status": "active"},
-                {"username": "whx_staff02", "uid": 1004, "gid": 1004, "home": "/home/whx_staff02", "shell": "/bin/bash", "groups": "wh-staff", "status": "active"},
-                {"username": "whx_leadsec", "uid": 1005, "gid": 1005, "home": "/home/whx_leadsec", "shell": "/bin/bash", "groups": "wh-admins", "status": "active"}
-            ],
-            "groups": ["wh-admins", "wh-managers", "wh-staff", "backup-operators", "sudo"]
+            "users": self._users,
+            "groups": self._groups
+        }
+
+    def get_linux_groups(self):
+        return {
+            "mode": "simulated",
+            "groups": self._groups
+        }
+
+    def lock_linux_user(self, username: str):
+        found = False
+        for u in self._users:
+            if u["username"] == username:
+                u["status"] = "locked"
+                u["shell"] = "/usr/sbin/nologin"
+                found = True
+                break
+        return {
+            "mode": "simulated",
+            "action": "lock",
+            "username": username,
+            "status": "success" if found else "not_found",
+            "message": f"Linux account {username} locked via usermod -L" if found else f"User {username} not found"
+        }
+
+    def unlock_linux_user(self, username: str):
+        found = False
+        for u in self._users:
+            if u["username"] == username:
+                u["status"] = "active"
+                if u["shell"] == "/usr/sbin/nologin":
+                    u["shell"] = "/bin/bash"
+                found = True
+                break
+        return {
+            "mode": "simulated",
+            "action": "unlock",
+            "username": username,
+            "status": "success" if found else "not_found",
+            "message": f"Linux account {username} unlocked via usermod -U" if found else f"User {username} not found"
+        }
+
+    def change_linux_user_shell(self, username: str, new_shell: str):
+        found = False
+        for u in self._users:
+            if u["username"] == username:
+                u["shell"] = new_shell
+                if new_shell in ("/usr/sbin/nologin", "/bin/false"):
+                    u["status"] = "locked"
+                else:
+                    u["status"] = "active"
+                found = True
+                break
+        return {
+            "mode": "simulated",
+            "action": "shell",
+            "username": username,
+            "shell": new_shell,
+            "status": "success" if found else "not_found",
+            "message": f"Changed login shell of {username} to {new_shell}" if found else f"User {username} not found"
         }

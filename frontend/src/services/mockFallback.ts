@@ -39,10 +39,44 @@ const INITIAL_PRODUCTS = [
 ];
 
 const INITIAL_EMPLOYEES = [
-  { id: 1, username: 'admin', full_name: 'Rashmi Gowda', role: 'admin', email: 'rashmigowda@Ubuntu-Linux-Admin', linux_username: 'rashmigowda', linux_group: 'warehouse-admins', status: 'active', last_login: new Date().toISOString() },
-  { id: 2, username: 'staff', full_name: 'Warehouse Operations Staff', role: 'staff', email: 'staff@warehousex.internal', linux_username: 'whx_staff', linux_group: 'warehouse-staff', status: 'active', last_login: new Date(Date.now() - 3600000).toISOString() },
-  { id: 3, username: 'manager', full_name: 'Logistics Shift Supervisor', role: 'manager', email: 'manager@warehousex.internal', linux_username: 'whx_manager', linux_group: 'warehouse-admins', status: 'active', last_login: new Date(Date.now() - 7200000).toISOString() },
-  { id: 4, username: 'monis', full_name: 'Monis Systems Engineer', role: 'admin', email: 'monis@Ubuntu-Linux-Admin', linux_username: 'monis', linux_group: 'warehouse-admins', status: 'active', last_login: new Date().toISOString() },
+  { id: 1, username: 'admin', full_name: 'Alexander Hayes', role: 'admin', email: 'admin@warehousex.internal', linux_user: 'whx_admin', linux_group: 'wh-admins', status: 'active', created_at: '2026-11-01T08:00:00Z' },
+  { id: 2, username: 'rashmi', full_name: 'Rashmi', role: 'admin', email: 'rashmi@warehousex.internal', linux_user: 'whx_rashmi', linux_group: 'wh-admins', status: 'active', created_at: '2026-11-01T08:30:00Z' },
+  { id: 3, username: 'panchak', full_name: 'Panchaksharayya', role: 'admin', email: 'panchak@warehousex.internal', linux_user: 'whx_panchak', linux_group: 'wh-admins', status: 'active', created_at: '2026-11-01T08:30:00Z' },
+  { id: 4, username: 'darshan', full_name: 'S Darshan Sai', role: 'manager', email: 'darshan@warehousex.internal', linux_user: 'whx_darshan', linux_group: 'wh-managers', status: 'active', created_at: '2026-11-01T09:00:00Z' },
+  { id: 5, username: 'apoorva', full_name: 'Apoorva P Keretot', role: 'manager', email: 'apoorva@warehousex.internal', linux_user: 'whx_apoorva', linux_group: 'wh-managers', status: 'active', created_at: '2026-11-01T09:00:00Z' },
+  { id: 6, username: 'manager', full_name: 'Elena Rostova', role: 'manager', email: 'manager@warehousex.internal', linux_user: 'whx_manager', linux_group: 'wh-managers', status: 'active', created_at: '2026-11-01T09:15:00Z' },
+  { id: 7, username: 'schen', full_name: 'Sarah Chen', role: 'manager', email: 's.chen@warehousex.internal', linux_user: 'whx_leadsec', linux_group: 'wh-admins', status: 'active', created_at: '2026-11-02T10:00:00Z' },
+  { id: 8, username: 'staff', full_name: 'Devon Vance', role: 'staff', email: 'staff@warehousex.internal', linux_user: 'whx_staff01', linux_group: 'wh-staff', status: 'active', created_at: '2026-11-02T10:30:00Z' },
+  { id: 9, username: 'dkalu', full_name: 'David Kalu', role: 'staff', email: 'd.kalu@warehousex.internal', linux_user: 'whx_staff02', linux_group: 'wh-staff', status: 'active', created_at: '2026-11-02T11:00:00Z' },
+  { id: 10, username: 'ppatel', full_name: 'Priya Patel', role: 'staff', email: 'p.patel@warehousex.internal', linux_user: 'whx_staff03', linux_group: 'wh-staff', status: 'active', created_at: '2026-11-02T11:30:00Z' },
+  { id: 11, username: 'kpatel', full_name: 'Kiran Patel', role: 'staff', email: 'k.patel@warehousex.internal', linux_user: 'whx_kpatel', linux_group: 'wh-staff', status: 'active', created_at: '2026-11-03T08:00:00Z' },
+  { id: 12, username: 'rjohnson', full_name: 'Robert Johnson', role: 'staff', email: 'r.johnson@warehousex.internal', linux_user: 'whx_rjohnson', linux_group: 'wh-staff', status: 'active', created_at: '2026-11-03T08:30:00Z' },
+  { id: 13, username: 'amendoza', full_name: 'Anita Mendoza', role: 'staff', email: 'a.mendoza@warehousex.internal', linux_user: 'whx_amendoza', linux_group: 'wh-staff', status: 'active', created_at: '2026-11-03T09:00:00Z' },
+  { id: 14, username: 'mross', full_name: 'Marcus Ross', role: 'staff', email: 'm.ross@warehousex.internal', linux_user: 'whx_staff04', linux_group: 'wh-staff', status: 'inactive', created_at: '2026-11-03T09:30:00Z' },
+];
+
+const INITIAL_LINUX_USERS = [
+  { username: 'whx_admin', uid: 1001, gid: 1001, home: '/home/whx_admin', shell: '/bin/bash', groups: 'wh-admins sudo', status: 'active' },
+  { username: 'whx_manager', uid: 1002, gid: 1002, home: '/home/whx_manager', shell: '/bin/bash', groups: 'wh-managers', status: 'active' },
+  { username: 'whx_staff01', uid: 1003, gid: 1003, home: '/home/whx_staff01', shell: '/bin/bash', groups: 'wh-staff', status: 'active' },
+  { username: 'whx_staff02', uid: 1004, gid: 1004, home: '/home/whx_staff02', shell: '/bin/bash', groups: 'wh-staff', status: 'active' },
+  { username: 'whx_leadsec', uid: 1005, gid: 1005, home: '/home/whx_leadsec', shell: '/bin/bash', groups: 'wh-admins', status: 'active' },
+  { username: 'whx_rashmi', uid: 1006, gid: 1001, home: '/home/whx_rashmi', shell: '/bin/bash', groups: 'wh-admins sudo', status: 'active' },
+  { username: 'whx_panchak', uid: 1007, gid: 1001, home: '/home/whx_panchak', shell: '/bin/bash', groups: 'wh-admins sudo', status: 'active' },
+  { username: 'whx_darshan', uid: 1008, gid: 1002, home: '/home/whx_darshan', shell: '/bin/bash', groups: 'wh-managers', status: 'active' },
+  { username: 'whx_apoorva', uid: 1009, gid: 1002, home: '/home/whx_apoorva', shell: '/bin/bash', groups: 'wh-managers backup-operators', status: 'active' },
+  { username: 'whx_kpatel', uid: 1010, gid: 1003, home: '/home/whx_kpatel', shell: '/bin/bash', groups: 'wh-staff', status: 'active' },
+  { username: 'whx_rjohnson', uid: 1011, gid: 1003, home: '/home/whx_rjohnson', shell: '/bin/bash', groups: 'wh-staff', status: 'active' },
+  { username: 'whx_amendoza', uid: 1012, gid: 1003, home: '/home/whx_amendoza', shell: '/bin/bash', groups: 'wh-staff', status: 'active' },
+  { username: 'whx_staff04', uid: 1013, gid: 1003, home: '/home/whx_staff04', shell: '/usr/sbin/nologin', groups: 'wh-staff', status: 'locked' },
+];
+
+const INITIAL_LINUX_GROUPS = [
+  { name: 'wh-admins', gid: 1001, description: 'Full administrative Linux & storage access', members: ['whx_admin', 'whx_leadsec', 'whx_rashmi', 'whx_panchak'] },
+  { name: 'wh-managers', gid: 1002, description: 'Warehouse operational management and inventory control', members: ['whx_manager', 'whx_darshan', 'whx_apoorva'] },
+  { name: 'wh-staff', gid: 1003, description: 'Standard inventory cycle counting & fulfillment floor operators', members: ['whx_staff01', 'whx_staff02', 'whx_kpatel', 'whx_rjohnson', 'whx_amendoza'] },
+  { name: 'backup-operators', gid: 1004, description: 'Disaster recovery, LVM snapshot & backup privileges', members: ['whx_admin', 'whx_apoorva'] },
+  { name: 'sudo', gid: 27, description: 'Elevated POSIX sudoers capability', members: ['whx_admin', 'whx_rashmi', 'whx_panchak'] }
 ];
 
 const INITIAL_BACKUPS = [
@@ -396,19 +430,102 @@ export async function handleMockRequest<T>(endpoint: string, options: RequestIni
     }
   }
 
-  // --- EMPLOYEES ---
+  // --- EMPLOYEES & LINUX USERS ---
   if (url.startsWith('/employees')) {
     let employees = getStored(STORAGE_KEYS.EMPLOYEES, INITIAL_EMPLOYEES);
+    let linuxUsers = getStored('whx_demo_linux_users', INITIAL_LINUX_USERS);
+    let linuxGroups = getStored('whx_demo_linux_groups', INITIAL_LINUX_GROUPS);
 
-    if (url === '/employees' && method === 'GET') {
-      return { employees, total: employees.length } as unknown as T;
+    if (url.startsWith('/employees/linux/users')) {
+      return { mode: 'simulated', users: linuxUsers, groups: linuxGroups } as unknown as T;
+    }
+
+    if (url.startsWith('/employees/linux/groups')) {
+      return { mode: 'simulated', groups: linuxGroups } as unknown as T;
+    }
+
+    if (url.match(/^\/employees\/linux\/user\/[^/]+\/lock/) && method === 'POST') {
+      const targetUser = url.split('/')[4];
+      linuxUsers = linuxUsers.map((u: any) =>
+        u.username === targetUser ? { ...u, status: 'locked', shell: '/usr/sbin/nologin' } : u
+      );
+      setStored('whx_demo_linux_users', linuxUsers);
+      return {
+        action: 'lock',
+        username: targetUser,
+        status: 'success',
+        message: `Linux account ${targetUser} locked via usermod -L`,
+      } as unknown as T;
+    }
+
+    if (url.match(/^\/employees\/linux\/user\/[^/]+\/unlock/) && method === 'POST') {
+      const targetUser = url.split('/')[4];
+      linuxUsers = linuxUsers.map((u: any) =>
+        u.username === targetUser ? { ...u, status: 'active', shell: '/bin/bash' } : u
+      );
+      setStored('whx_demo_linux_users', linuxUsers);
+      return {
+        action: 'unlock',
+        username: targetUser,
+        status: 'success',
+        message: `Linux account ${targetUser} unlocked via usermod -U`,
+      } as unknown as T;
+    }
+
+    if (url.match(/^\/employees\/linux\/user\/[^/]+\/shell/) && method === 'POST') {
+      const targetUser = url.split('/')[4];
+      const newShell = body.shell || '/bin/bash';
+      const newStatus = newShell in ['/usr/sbin/nologin', '/bin/false'] ? 'locked' : 'active';
+      linuxUsers = linuxUsers.map((u: any) =>
+        u.username === targetUser ? { ...u, shell: newShell, status: newStatus } : u
+      );
+      setStored('whx_demo_linux_users', linuxUsers);
+      return {
+        action: 'shell',
+        username: targetUser,
+        shell: newShell,
+        status: 'success',
+        message: `Changed login shell of ${targetUser} to ${newShell}`,
+      } as unknown as T;
+    }
+
+    if (url.startsWith('/employees') && method === 'GET') {
+      return {
+        employees,
+        linux_system_accounts: linuxUsers,
+        count: employees.length,
+      } as unknown as T;
     }
 
     if (url === '/employees' && method === 'POST') {
-      const newEmp = { id: Date.now(), ...body, linux_username: `whx_${body.username}`, status: 'active' };
+      const newEmp = {
+        id: Date.now(),
+        ...body,
+        linux_user: `whx_${body.username}`,
+        linux_group: body.role === 'admin' ? 'wh-admins' : body.role === 'manager' ? 'wh-managers' : 'wh-staff',
+        status: 'active',
+        created_at: new Date().toISOString(),
+      };
       employees = [...employees, newEmp];
       setStored(STORAGE_KEYS.EMPLOYEES, employees);
-      return { message: 'Employee provisioned in database and Linux user mapping', employee: newEmp } as unknown as T;
+
+      const newLinuxUser = {
+        username: `whx_${body.username}`,
+        uid: 1010 + employees.length,
+        gid: body.role === 'admin' ? 1001 : body.role === 'manager' ? 1002 : 1003,
+        home: `/home/whx_${body.username}`,
+        shell: '/bin/bash',
+        groups: newEmp.linux_group,
+        status: 'active',
+      };
+      linuxUsers = [...linuxUsers, newLinuxUser];
+      setStored('whx_demo_linux_users', linuxUsers);
+
+      return {
+        message: 'Employee provisioned in database and Linux user mapping',
+        employee_id: newEmp.id,
+        linux_sync: 'Synchronized with Linux user database',
+      } as unknown as T;
     }
 
     if (method === 'PUT' && url.match(/^\/employees\/\d+/)) {

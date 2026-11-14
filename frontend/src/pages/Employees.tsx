@@ -5,10 +5,19 @@ import {
   Terminal,
   Edit2,
   Trash2,
-  Search
+  Search,
+  Lock,
+  Unlock,
+  ShieldCheck,
+  CheckCircle2,
+  AlertCircle,
+  RefreshCw,
+  FolderGit2,
+  Layers,
+  KeyRound
 } from 'lucide-react';
 import { employeeService } from '../services';
-import { User, LinuxSystemAccount } from '../types';
+import { User, LinuxSystemAccount, LinuxGroup } from '../types';
 import { StatusBadge } from '../components/common/StatusBadge';
 import { Modal } from '../components/common/Modal';
 import { ConfirmDialog } from '../components/common/ConfirmDialog';
@@ -20,9 +29,12 @@ interface EmployeesProps {
 export const Employees: React.FC<EmployeesProps> = ({ currentUserRole = 'admin' }) => {
   const [employees, setEmployees] = useState<User[]>([]);
   const [linuxAccounts, setLinuxAccounts] = useState<LinuxSystemAccount[]>([]);
+  const [linuxGroups, setLinuxGroups] = useState<LinuxGroup[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'employees' | 'linux'>('employees');
+  const [actionNotice, setActionNotice] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [isProcessingAction, setIsProcessingAction] = useState<string | null>(null);
 
   // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -47,6 +59,16 @@ export const Employees: React.FC<EmployeesProps> = ({ currentUserRole = 'admin' 
       const res = await employeeService.getEmployees({ search: searchQuery });
       setEmployees(res.employees || []);
       setLinuxAccounts(res.linux_system_accounts || []);
+
+      // Also fetch linux groups
+      try {
+        const groupsRes = await employeeService.getLinuxGroups();
+        if (groupsRes && groupsRes.groups) {
+          setLinuxGroups(groupsRes.groups);
+        }
+      } catch (err) {
+        console.warn('Failed fetching linux groups:', err);
+      }
     } catch (err) {
       console.error('Failed to load employees:', err);
     } finally {
@@ -57,6 +79,66 @@ export const Employees: React.FC<EmployeesProps> = ({ currentUserRole = 'admin' 
   useEffect(() => {
     loadData();
   }, [searchQuery]);
+
+  // Handle Linux User Lock
+  const handleLockLinuxUser = async (username: string) => {
+    setIsProcessingAction(username);
+    try {
+      const res = await employeeService.lockLinuxUser(username);
+      setActionNotice({
+        type: 'success',
+        message: res.message || `Linux account ${username} successfully locked (usermod -L)`,
+      });
+      loadData();
+    } catch (err: any) {
+      setActionNotice({
+        type: 'error',
+        message: err.message || `Failed to lock account ${username}`,
+      });
+    } finally {
+      setIsProcessingAction(null);
+    }
+  };
+
+  // Handle Linux User Unlock
+  const handleUnlockLinuxUser = async (username: string) => {
+    setIsProcessingAction(username);
+    try {
+      const res = await employeeService.unlockLinuxUser(username);
+      setActionNotice({
+        type: 'success',
+        message: res.message || `Linux account ${username} unlocked (usermod -U)`,
+      });
+      loadData();
+    } catch (err: any) {
+      setActionNotice({
+        type: 'error',
+        message: err.message || `Failed to unlock account ${username}`,
+      });
+    } finally {
+      setIsProcessingAction(null);
+    }
+  };
+
+  // Handle Shell Change
+  const handleChangeShell = async (username: string, newShell: string) => {
+    setIsProcessingAction(username);
+    try {
+      const res = await employeeService.changeLinuxUserShell(username, newShell);
+      setActionNotice({
+        type: 'success',
+        message: res.message || `Login shell of ${username} updated to ${newShell}`,
+      });
+      loadData();
+    } catch (err: any) {
+      setActionNotice({
+        type: 'error',
+        message: err.message || `Failed to change shell for ${username}`,
+      });
+    } finally {
+      setIsProcessingAction(null);
+    }
+  };
 
   const handleOpenAdd = () => {
     setEditingEmployee(null);
@@ -91,8 +173,16 @@ export const Employees: React.FC<EmployeesProps> = ({ currentUserRole = 'admin' 
     try {
       if (editingEmployee) {
         await employeeService.updateEmployee(editingEmployee.id, formData as any);
+        setActionNotice({
+          type: 'success',
+          message: `Updated profile for @${editingEmployee.username}`,
+        });
       } else {
-        await employeeService.createEmployee(formData as any);
+        const res = await employeeService.createEmployee(formData as any);
+        setActionNotice({
+          type: 'success',
+          message: `Provisioned employee @${formData.username}. ${res.linux_sync || ''}`,
+        });
       }
       setIsModalOpen(false);
       loadData();
@@ -110,12 +200,28 @@ export const Employees: React.FC<EmployeesProps> = ({ currentUserRole = 'admin' 
     if (!employeeToDelete) return;
     try {
       await employeeService.deleteEmployee(employeeToDelete.id);
+      setActionNotice({
+        type: 'success',
+        message: `Revoked employee @${employeeToDelete.username} and purged corresponding credentials.`,
+      });
       setIsDeleteDialogOpen(false);
       loadData();
     } catch (err: any) {
       alert(err.message || 'Error deleting employee');
     }
   };
+
+  // Filter Linux accounts by search query
+  const filteredLinuxAccounts = linuxAccounts.filter((acc) => {
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      acc.username.toLowerCase().includes(q) ||
+      acc.home.toLowerCase().includes(q) ||
+      acc.shell.toLowerCase().includes(q) ||
+      (acc.groups && acc.groups.toLowerCase().includes(q))
+    );
+  });
 
   return (
     <div className="space-y-6">
@@ -127,7 +233,7 @@ export const Employees: React.FC<EmployeesProps> = ({ currentUserRole = 'admin' 
             <span>Employee & Linux User Management</span>
           </h2>
           <p className="text-xs font-mono-tech text-[#5E5E61] mt-1">
-            Role-based warehouse authentication synchronized with Ubuntu Linux system accounts and groups
+            Role-based warehouse authentication synchronized with Ubuntu Linux POSIX system accounts (/etc/passwd, /etc/group)
           </p>
         </div>
 
@@ -139,6 +245,32 @@ export const Employees: React.FC<EmployeesProps> = ({ currentUserRole = 'admin' 
           <span>Provision Employee</span>
         </button>
       </div>
+
+      {/* Action Notification Banner */}
+      {actionNotice && (
+        <div
+          className={`p-3.5 rounded-2xl flex items-center justify-between font-mono-tech text-xs transition-all ${
+            actionNotice.type === 'success'
+              ? 'bg-[#EAF3DE] border border-[#08482D]/20 text-[#08482D]'
+              : 'bg-[#FEE2E2] border border-[#DC2626]/20 text-[#DC2626]'
+          }`}
+        >
+          <div className="flex items-center space-x-2">
+            {actionNotice.type === 'success' ? (
+              <CheckCircle2 className="w-4 h-4 shrink-0" />
+            ) : (
+              <AlertCircle className="w-4 h-4 shrink-0" />
+            )}
+            <span>{actionNotice.message}</span>
+          </div>
+          <button
+            onClick={() => setActionNotice(null)}
+            className="text-[11px] font-bold underline hover:opacity-75 cursor-pointer ml-4"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* View Switcher & Search Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-[#FFFFFF] border border-[#08482D]/12 rounded-2xl shadow-xs">
@@ -162,7 +294,7 @@ export const Employees: React.FC<EmployeesProps> = ({ currentUserRole = 'admin' 
             }`}
           >
             <Terminal className="w-3.5 h-3.5" />
-            <span>Linux Accounts ({linuxAccounts.length})</span>
+            <span>Linux System Accounts ({linuxAccounts.length})</span>
           </button>
         </div>
 
@@ -178,7 +310,9 @@ export const Employees: React.FC<EmployeesProps> = ({ currentUserRole = 'admin' 
         </div>
       </div>
 
-      {/* Main Content: Warehouse Staff View */}
+      {/* ============================================================ */}
+      {/* 1. WAREHOUSE STAFF VIEW */}
+      {/* ============================================================ */}
       {activeTab === 'employees' ? (
         <div className="rounded-3xl border border-[#08482D]/12 bg-[#FFFFFF] overflow-hidden shadow-xs">
           <table className="w-full text-left font-mono-tech text-xs">
@@ -254,50 +388,219 @@ export const Employees: React.FC<EmployeesProps> = ({ currentUserRole = 'admin' 
           </table>
         </div>
       ) : (
-        /* Linux System Accounts View */
-        <div className="rounded-3xl border border-[#08482D]/12 bg-[#FFFFFF] overflow-hidden shadow-xs">
-          <div className="p-4 bg-[#FAFCF6] border-b border-[#08482D]/12 flex items-center justify-between">
-            <div className="flex items-center space-x-2 text-xs font-mono-tech text-[#08482D] font-bold">
-              <Terminal className="w-4 h-4" />
-              <span>Ubuntu /etc/passwd Synchronized System Accounts</span>
+        /* ============================================================ */
+        /* 2. LINUX SYSTEM ACCOUNTS & PRIVILEGE MANAGEMENT VIEW */
+        /* ============================================================ */
+        <div className="space-y-6">
+          {/* Security Summary Cards */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="p-4 rounded-2xl bg-[#FFFFFF] border border-[#08482D]/12 shadow-xs">
+              <div className="text-[11px] font-mono-tech text-[#5E5E61] uppercase font-bold">
+                Total System Accounts
+              </div>
+              <div className="text-xl font-heading font-black text-[#08482D] mt-1">
+                {linuxAccounts.length}
+              </div>
+              <div className="text-[10px] font-mono-tech text-[#A3A3A3] mt-0.5">
+                POSIX UID ≥ 1000
+              </div>
             </div>
-            <span className="text-[11px] font-mono-tech text-[#5E5E61]">UID Range: &gt;= 1000 or whx_*</span>
+
+            <div className="p-4 rounded-2xl bg-[#FFFFFF] border border-[#08482D]/12 shadow-xs">
+              <div className="text-[11px] font-mono-tech text-[#5E5E61] uppercase font-bold">
+                Interactive Shells
+              </div>
+              <div className="text-xl font-heading font-black text-[#08482D] mt-1">
+                {linuxAccounts.filter((a) => a.shell === '/bin/bash').length}
+              </div>
+              <div className="text-[10px] font-mono-tech text-[#A3A3A3] mt-0.5">
+                /bin/bash enabled
+              </div>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-[#FFFFFF] border border-[#08482D]/12 shadow-xs">
+              <div className="text-[11px] font-mono-tech text-[#5E5E61] uppercase font-bold">
+                Locked / Restricted
+              </div>
+              <div className="text-xl font-heading font-black text-[#B45309] mt-1">
+                {linuxAccounts.filter((a) => a.status === 'locked' || a.shell.includes('nologin')).length}
+              </div>
+              <div className="text-[10px] font-mono-tech text-[#A3A3A3] mt-0.5">
+                /usr/sbin/nologin
+              </div>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-[#FFFFFF] border border-[#08482D]/12 shadow-xs">
+              <div className="text-[11px] font-mono-tech text-[#5E5E61] uppercase font-bold">
+                Security Groups
+              </div>
+              <div className="text-xl font-heading font-black text-[#101410] mt-1">
+                {linuxGroups.length > 0 ? linuxGroups.length : 5}
+              </div>
+              <div className="text-[10px] font-mono-tech text-[#A3A3A3] mt-0.5">
+                wh-admins, wh-managers, ...
+              </div>
+            </div>
           </div>
 
-          <table className="w-full text-left font-mono-tech text-xs">
-            <thead className="bg-[#FFFFFF] border-b border-[#08482D]/10 text-[#5E5E61] uppercase text-[10px] tracking-wider font-bold">
-              <tr>
-                <th className="py-3 px-4">Linux Username</th>
-                <th className="py-3 px-4">UID / GID</th>
-                <th className="py-3 px-4">Home Directory</th>
-                <th className="py-3 px-4">Login Shell</th>
-                <th className="py-3 px-4">Group Memberships</th>
-                <th className="py-3 px-4 text-center">Shell Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#08482D]/8">
-              {linuxAccounts.map((acc, idx) => (
-                <tr key={idx} className="hover:bg-[#F8FAF4] transition-colors">
-                  <td className="py-3 px-4 font-bold text-[#08482D]">
-                    {acc.username}
-                  </td>
-                  <td className="py-3 px-4 text-[#5E5E61]">
-                    {acc.uid} : {acc.gid}
-                  </td>
-                  <td className="py-3 px-4 text-[#101410]">{acc.home}</td>
-                  <td className="py-3 px-4 text-[#5E5E61]">
-                    <span className="px-1.5 py-0.5 rounded bg-[#F5F8EF] border border-[#08482D]/15 text-[11px] font-bold">
-                      {acc.shell}
+          {/* Linux Security Groups & Access Control Matrix */}
+          <div className="p-5 rounded-3xl bg-[#FFFFFF] border border-[#08482D]/12 shadow-xs space-y-4">
+            <div className="flex items-center justify-between border-b border-[#08482D]/10 pb-3">
+              <div className="flex items-center space-x-2">
+                <ShieldCheck className="w-5 h-5 text-[#08482D]" />
+                <h3 className="text-sm font-heading font-extrabold text-[#101410]">
+                  Ubuntu POSIX Security Groups & Sudo Privileges
+                </h3>
+              </div>
+              <span className="px-2.5 py-0.5 rounded-full bg-[#DAE7C7] text-[#08482D] font-mono-tech text-[10px] font-bold">
+                /etc/group
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              {linuxGroups.map((grp) => (
+                <div
+                  key={grp.name}
+                  className="p-3.5 rounded-2xl bg-[#FAFCF6] border border-[#08482D]/12 space-y-2 font-mono-tech text-xs"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-[#08482D] text-[12px] flex items-center space-x-1">
+                      <span>{grp.name}</span>
                     </span>
-                  </td>
-                  <td className="py-3 px-4 text-[#5E5E61] text-[11px]">{acc.groups}</td>
-                  <td className="py-3 px-4 text-center">
-                    <StatusBadge status={acc.status || 'active'} size="sm" />
-                  </td>
-                </tr>
+                    <span className="px-2 py-0.5 rounded-md bg-[#F5F8EF] text-[#5E5E61] text-[10px] font-bold border border-[#08482D]/10">
+                      GID: {grp.gid}
+                    </span>
+                  </div>
+
+                  {grp.description && (
+                    <p className="text-[10.5px] text-[#5E5E61] leading-relaxed">
+                      {grp.description}
+                    </p>
+                  )}
+
+                  <div className="pt-2 border-t border-[#08482D]/8">
+                    <div className="text-[9.5px] uppercase text-[#A3A3A3] font-bold mb-1">
+                      Active Members ({grp.members ? grp.members.length : 0})
+                    </div>
+                    <div className="flex flex-wrap gap-1">
+                      {grp.members && grp.members.length > 0 ? (
+                        grp.members.map((m) => (
+                          <span
+                            key={m}
+                            className="px-2 py-0.5 rounded bg-[#EAF3DE] text-[#08482D] text-[10px] font-bold border border-[#08482D]/15"
+                          >
+                            {m}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="text-[10px] text-[#A3A3A3] italic">No members assigned</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
               ))}
-            </tbody>
-          </table>
+            </div>
+          </div>
+
+          {/* Linux Accounts Interactive Table */}
+          <div className="rounded-3xl border border-[#08482D]/12 bg-[#FFFFFF] overflow-hidden shadow-xs">
+            <div className="p-4 bg-[#FAFCF6] border-b border-[#08482D]/12 flex items-center justify-between">
+              <div className="flex items-center space-x-2 text-xs font-mono-tech text-[#08482D] font-bold">
+                <Terminal className="w-4 h-4" />
+                <span>Synchronized POSIX Accounts (/etc/passwd)</span>
+              </div>
+              <span className="text-[11px] font-mono-tech text-[#5E5E61]">
+                Live usermod -L / usermod -U execution enabled
+              </span>
+            </div>
+
+            <table className="w-full text-left font-mono-tech text-xs">
+              <thead className="bg-[#FFFFFF] border-b border-[#08482D]/10 text-[#5E5E61] uppercase text-[10px] tracking-wider font-bold">
+                <tr>
+                  <th className="py-3 px-4">Linux Username</th>
+                  <th className="py-3 px-4">UID : GID</th>
+                  <th className="py-3 px-4">Home Directory</th>
+                  <th className="py-3 px-4">Login Shell</th>
+                  <th className="py-3 px-4">POSIX Groups</th>
+                  <th className="py-3 px-4 text-center">Account Status</th>
+                  <th className="py-3 px-4 text-right">Access Controls</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#08482D]/8">
+                {filteredLinuxAccounts.map((acc) => {
+                  const isLocked = acc.status === 'locked' || acc.shell.includes('nologin');
+                  const isProcessing = isProcessingAction === acc.username;
+
+                  return (
+                    <tr key={acc.username} className="hover:bg-[#F8FAF4] transition-colors">
+                      <td className="py-3 px-4 font-bold text-[#08482D]">
+                        {acc.username}
+                      </td>
+                      <td className="py-3 px-4 text-[#5E5E61]">
+                        {acc.uid} : {acc.gid}
+                      </td>
+                      <td className="py-3 px-4 text-[#101410]">{acc.home}</td>
+                      <td className="py-3 px-4">
+                        <select
+                          value={acc.shell}
+                          onChange={(e) => handleChangeShell(acc.username, e.target.value)}
+                          disabled={isProcessing}
+                          className="px-2 py-1 rounded bg-[#F5F8EF] border border-[#08482D]/15 text-[11px] font-bold text-[#08482D] cursor-pointer focus:outline-none"
+                        >
+                          <option value="/bin/bash">/bin/bash (Full Shell)</option>
+                          <option value="/usr/sbin/nologin">/usr/sbin/nologin (Blocked)</option>
+                        </select>
+                      </td>
+                      <td className="py-3 px-4 text-[#5E5E61] text-[11px]">
+                        <div className="flex flex-wrap gap-1">
+                          {acc.groups.split(' ').map((g) => (
+                            <span
+                              key={g}
+                              className="px-1.5 py-0.5 rounded bg-[#FAFCF6] border border-[#08482D]/10 text-[10px]"
+                            >
+                              {g}
+                            </span>
+                          ))}
+                        </div>
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        <StatusBadge status={isLocked ? 'locked' : 'active'} size="sm" />
+                      </td>
+                      <td className="py-3 px-4 text-right">
+                        <div className="flex items-center justify-end space-x-2">
+                          {isLocked ? (
+                            <button
+                              onClick={() => handleUnlockLinuxUser(acc.username)}
+                              disabled={isProcessing}
+                              title="Unlock account (usermod -U)"
+                              className="flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-[#EAF3DE] hover:bg-[#DAE7C7] text-[#08482D] border border-[#08482D]/20 text-[11px] font-bold transition-all cursor-pointer disabled:opacity-50"
+                            >
+                              <Unlock className="w-3.5 h-3.5" />
+                              <span>Unlock</span>
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => handleLockLinuxUser(acc.username)}
+                              disabled={isProcessing || acc.username === 'whx_admin'}
+                              title={
+                                acc.username === 'whx_admin'
+                                  ? 'Root admin account cannot be locked'
+                                  : 'Lock account (usermod -L)'
+                              }
+                              className="flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-[#FEF2F2] hover:bg-[#FEE2E2] text-[#DC2626] border border-[#DC2626]/20 text-[11px] font-bold transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                            >
+                              <Lock className="w-3.5 h-3.5" />
+                              <span>Lock</span>
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 
@@ -352,9 +655,9 @@ export const Employees: React.FC<EmployeesProps> = ({ currentUserRole = 'admin' 
                 onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                 className="w-full px-3 py-2 bg-[#FAFCF6] border border-[#08482D]/20 rounded-xl text-[#101410] font-bold cursor-pointer"
               >
-                <option value="staff">Warehouse Staff</option>
-                <option value="manager">Warehouse Manager</option>
-                <option value="admin">Administrator</option>
+                <option value="staff">Warehouse Staff (wh-staff)</option>
+                <option value="manager">Warehouse Manager (wh-managers)</option>
+                <option value="admin">Administrator (wh-admins + sudo)</option>
               </select>
             </div>
             <div>
@@ -393,7 +696,7 @@ export const Employees: React.FC<EmployeesProps> = ({ currentUserRole = 'admin' 
                 onChange={(e) => setFormData({ ...formData, sync_linux: e.target.checked })}
                 className="rounded bg-[#FAFCF6] border-[#08482D]/30 text-[#08482D] focus:ring-0"
               />
-              <span>Create synchronized Ubuntu system user in /etc/passwd</span>
+              <span>Create synchronized Ubuntu system user in /etc/passwd & /etc/group</span>
             </label>
           )}
 

@@ -81,6 +81,28 @@ export const employeeService = {
     }),
   deleteEmployee: (id: number) =>
     apiRequest<{ message: string }>(`/employees/${id}`, { method: 'DELETE' }),
+  getLinuxUsers: () =>
+    apiRequest<{ mode: string; users: any[]; groups: any[] }>('/employees/linux/users'),
+  getLinuxGroups: () =>
+    apiRequest<{ mode: string; groups: any[] }>('/employees/linux/groups'),
+  lockLinuxUser: (username: string) =>
+    apiRequest<{ action: string; username: string; status: string; message: string }>(
+      `/employees/linux/user/${username}/lock`,
+      { method: 'POST' }
+    ),
+  unlockLinuxUser: (username: string) =>
+    apiRequest<{ action: string; username: string; status: string; message: string }>(
+      `/employees/linux/user/${username}/unlock`,
+      { method: 'POST' }
+    ),
+  changeLinuxUserShell: (username: string, shell: string) =>
+    apiRequest<{ action: string; username: string; shell: string; status: string; message: string }>(
+      `/employees/linux/user/${username}/shell`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ shell }),
+      }
+    ),
 };
 
 // Storage Services

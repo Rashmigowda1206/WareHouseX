@@ -102,6 +102,13 @@ export interface LinuxSystemAccount {
   status: string;
 }
 
+export interface LinuxGroup {
+  name: string;
+  gid: number;
+  description?: string;
+  members: string[];
+}
+
 export interface SystemMetrics {
   mode: 'live' | 'simulated';
   environment?: string;
