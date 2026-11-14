@@ -9,7 +9,7 @@ html_content = f"""<!DOCTYPE html>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>WareHouseX — Academic & Technical Presentation Poster</title>
+  <title>WareHouseX — A3 Landscape Presentation Poster</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@600;700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
@@ -27,8 +27,8 @@ html_content = f"""<!DOCTYPE html>
       --border: rgba(8, 72, 45, 0.14);
       --border-strong: rgba(8, 72, 45, 0.28);
       --terminal-bg: #0C120E;
-      --shadow: 0 4px 20px -2px rgba(8, 72, 45, 0.08);
-      --shadow-lg: 0 10px 30px -4px rgba(8, 72, 45, 0.12);
+      --shadow: 0 4px 16px -2px rgba(8, 72, 45, 0.08);
+      --shadow-lg: 0 10px 28px -4px rgba(8, 72, 45, 0.12);
     }}
 
     * {{
@@ -41,32 +41,50 @@ html_content = f"""<!DOCTYPE html>
       background-color: var(--bg);
       color: var(--ink);
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      line-height: 1.45;
-      padding: 24px;
+      line-height: 1.35;
+      padding: 20px;
       -webkit-font-smoothing: antialiased;
-    }}
-
-    .poster-container {{
-      max-width: 1780px;
-      margin: 0 auto;
-      background: var(--bg);
-    }}
-
-    /* Print Controls */
-    .action-bar {{
       display: flex;
-      justify-content: flex-end;
-      gap: 12px;
-      margin-bottom: 20px;
+      flex-direction: column;
+      align-items: center;
+    }}
+
+    /* Action Toolbar (Hidden in Print) */
+    .action-bar {{
+      width: 100%;
+      max-width: 1588px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }}
+
+    .a3-pill {{
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--forest);
+      color: #FFFFFF;
+      padding: 6px 16px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 0.5px;
+    }}
+
+    .btn-group {{
+      display: flex;
+      gap: 10px;
     }}
 
     .btn {{
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 10px 20px;
+      padding: 9px 18px;
       border-radius: 9999px;
-      font-size: 13px;
+      font-size: 12.5px;
       font-weight: 700;
       cursor: pointer;
       text-decoration: none;
@@ -78,7 +96,7 @@ html_content = f"""<!DOCTYPE html>
       background: var(--forest);
       color: #FFFFFF;
       border: 1px solid var(--forest);
-      box-shadow: 0 4px 14px rgba(8, 72, 45, 0.25);
+      box-shadow: 0 3px 12px rgba(8, 72, 45, 0.25);
     }}
 
     .btn-primary:hover {{
@@ -96,42 +114,35 @@ html_content = f"""<!DOCTYPE html>
       background: var(--mint-light);
     }}
 
-    /* Poster Frame */
-    .poster-card {{
+    /* Exact A3 Landscape Aspect-Ratio Poster Container */
+    .poster-container {{
+      width: 1588px; /* 420mm scaled to 96dpi screen */
+      height: 1123px; /* 297mm scaled to 96dpi screen */
+      max-width: 1588px;
+      max-height: 1123px;
       background: #FFFFFF;
       border: 2px solid var(--border);
-      border-radius: 36px;
-      padding: 36px;
+      border-radius: 24px;
+      padding: 22px 24px;
       box-shadow: var(--shadow-lg);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
       position: relative;
     }}
 
-    /* Top Institution & Title Header */
+    /* Header Banner */
     .header-banner {{
       background: linear-gradient(135deg, #08482D 0%, #063823 100%);
       color: #FFFFFF;
-      border-radius: 28px;
-      padding: 36px 44px;
+      border-radius: 18px;
+      padding: 18px 24px;
       display: flex;
       flex-direction: column;
-      gap: 24px;
-      margin-bottom: 28px;
-      box-shadow: 0 12px 36px rgba(8, 72, 45, 0.22);
+      gap: 12px;
       border: 1px solid rgba(218, 231, 199, 0.2);
-      position: relative;
-      overflow: hidden;
-    }}
-
-    .header-banner::before {{
-      content: '';
-      position: absolute;
-      right: -80px;
-      top: -80px;
-      width: 320px;
-      height: 320px;
-      background: radial-gradient(circle, rgba(218, 231, 199, 0.15) 0%, transparent 70%);
-      border-radius: 50%;
-      pointer-events: none;
+      box-shadow: 0 6px 20px rgba(8, 72, 45, 0.2);
     }}
 
     .header-top {{
@@ -139,52 +150,51 @@ html_content = f"""<!DOCTYPE html>
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-      padding-bottom: 16px;
+      padding-bottom: 8px;
     }}
 
     .university-brand {{
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 12px;
     }}
 
     .uni-logo-mark {{
-      width: 48px;
-      height: 48px;
+      width: 36px;
+      height: 36px;
       background: #FFFFFF;
-      border-radius: 12px;
+      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
       color: var(--forest);
       font-weight: 900;
-      font-size: 22px;
+      font-size: 16px;
       font-family: 'Inter Tight', sans-serif;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
     }}
 
     .uni-text h3 {{
-      font-size: 17px;
+      font-size: 14.5px;
       font-weight: 800;
       letter-spacing: 0.5px;
       text-transform: uppercase;
       font-family: 'Inter Tight', sans-serif;
       color: #FFFFFF;
+      line-height: 1.1;
     }}
 
     .uni-text p {{
-      font-size: 12px;
+      font-size: 10.5px;
       color: var(--mint);
       font-family: 'JetBrains Mono', monospace;
-      letter-spacing: 0.3px;
     }}
 
     .course-badge {{
       background: rgba(218, 231, 199, 0.15);
       border: 1px solid rgba(218, 231, 199, 0.35);
-      padding: 8px 16px;
+      padding: 5px 14px;
       border-radius: 9999px;
-      font-size: 12px;
+      font-size: 10.5px;
       font-family: 'JetBrains Mono', monospace;
       font-weight: 600;
       color: #FFFFFF;
@@ -192,75 +202,73 @@ html_content = f"""<!DOCTYPE html>
 
     .header-main {{
       display: grid;
-      grid-template-columns: 1.4fr 1.6fr;
-      gap: 32px;
+      grid-template-columns: 1.25fr 1.75fr;
+      gap: 20px;
       align-items: center;
     }}
 
     .project-titles h1 {{
-      font-size: 54px;
+      font-size: 42px;
       font-weight: 900;
-      letter-spacing: -1.5px;
-      line-height: 1.05;
+      letter-spacing: -1px;
+      line-height: 1.0;
       font-family: 'Inter Tight', sans-serif;
       text-transform: uppercase;
       color: #FFFFFF;
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 10px;
     }}
 
     .project-titles h1 .title-badge {{
-      font-size: 14px;
+      font-size: 11px;
       background: var(--mint);
       color: var(--forest);
-      padding: 4px 14px;
+      padding: 3px 10px;
       border-radius: 9999px;
-      letter-spacing: 1px;
-      vertical-align: middle;
+      letter-spacing: 0.8px;
       font-weight: 800;
     }}
 
     .project-titles h2 {{
-      font-size: 18.5px;
+      font-size: 14.5px;
       font-weight: 600;
       color: var(--mint);
-      margin-top: 10px;
-      line-height: 1.35;
+      margin-top: 6px;
+      line-height: 1.25;
     }}
 
     .tagline-strip {{
       display: inline-flex;
       align-items: center;
-      gap: 16px;
-      margin-top: 14px;
-      background: rgba(0, 0, 0, 0.25);
-      border: 1px solid rgba(218, 231, 199, 0.25);
-      padding: 6px 18px;
-      border-radius: 10px;
-      font-size: 11.5px;
+      gap: 10px;
+      margin-top: 8px;
+      background: rgba(0, 0, 0, 0.28);
+      border: 1px solid rgba(218, 231, 199, 0.2);
+      padding: 4px 12px;
+      border-radius: 8px;
+      font-size: 10px;
       font-family: 'JetBrains Mono', monospace;
-      letter-spacing: 1.5px;
+      letter-spacing: 1.2px;
       font-weight: 700;
       color: #FFFFFF;
     }}
 
-    /* Student & Mentor Card */
+    /* Presenters Card */
     .presenters-card {{
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 20px;
-      padding: 20px 24px;
-      backdrop-filter: blur(10px);
+      border-radius: 14px;
+      padding: 12px 16px;
     }}
 
     .presenters-header {{
-      font-size: 11px;
+      font-size: 10px;
       font-family: 'JetBrains Mono', monospace;
-      letter-spacing: 1.5px;
+      letter-spacing: 1.2px;
       text-transform: uppercase;
       color: var(--mint);
-      margin-bottom: 12px;
+      margin-bottom: 8px;
       font-weight: 700;
       display: flex;
       justify-content: space-between;
@@ -268,56 +276,59 @@ html_content = f"""<!DOCTYPE html>
 
     .team-grid {{
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
     }}
 
     .team-member {{
       background: rgba(0, 0, 0, 0.25);
       border: 1px solid rgba(218, 231, 199, 0.18);
-      border-radius: 12px;
-      padding: 10px 14px;
+      border-radius: 9px;
+      padding: 7px 9px;
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 8px;
     }}
 
     .member-avatar {{
-      width: 32px;
-      height: 32px;
+      width: 26px;
+      height: 26px;
       background: var(--mint);
       color: var(--forest);
       font-weight: 800;
-      font-size: 12px;
-      border-radius: 8px;
+      font-size: 10.5px;
+      border-radius: 6px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-family: 'Inter Tight', sans-serif;
+      flex-shrink: 0;
     }}
 
     .member-info h4 {{
-      font-size: 13.5px;
+      font-size: 12px;
       font-weight: 700;
       color: #FFFFFF;
-      line-height: 1.2;
+      line-height: 1.15;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }}
 
     .member-info p {{
-      font-size: 11px;
+      font-size: 9.5px;
       color: var(--mint);
       font-family: 'JetBrains Mono', monospace;
-      margin-top: 2px;
     }}
 
     .mentor-bar {{
-      margin-top: 12px;
-      padding-top: 10px;
+      margin-top: 8px;
+      padding-top: 6px;
       border-top: 1px solid rgba(255, 255, 255, 0.15);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 11.5px;
+      font-size: 10px;
     }}
 
     .mentor-bar span:first-child {{
@@ -330,87 +341,91 @@ html_content = f"""<!DOCTYPE html>
       font-weight: 700;
     }}
 
-    /* 3-Column Poster Layout */
+    /* 3-Column Grid */
     .poster-columns {{
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 28px;
+      gap: 16px;
+      flex: 1;
+      margin: 12px 0;
+      min-height: 0;
     }}
 
     .col {{
       display: flex;
       flex-direction: column;
-      gap: 24px;
+      gap: 12px;
+      min-height: 0;
     }}
 
     /* Section Cards */
     .card {{
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 22px;
-      padding: 22px;
+      border-radius: 14px;
+      padding: 12px 14px;
       box-shadow: var(--shadow);
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 8px;
     }}
 
     .card-header {{
       display: flex;
       align-items: center;
-      gap: 12px;
-      border-bottom: 2px solid var(--border);
-      padding-bottom: 12px;
+      gap: 8px;
+      border-bottom: 1.5px solid var(--border);
+      padding-bottom: 6px;
     }}
 
     .card-icon {{
-      width: 36px;
-      height: 36px;
-      border-radius: 10px;
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
       background: var(--mint);
       color: var(--forest);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 18px;
+      font-size: 12px;
       font-weight: 800;
       flex-shrink: 0;
     }}
 
     .card-title h3 {{
-      font-size: 16px;
+      font-size: 12.5px;
       font-weight: 800;
       font-family: 'Inter Tight', sans-serif;
       color: var(--ink);
-      line-height: 1.2;
+      line-height: 1.15;
     }}
 
     .card-title p {{
-      font-size: 11px;
+      font-size: 9.5px;
       color: var(--subline);
       font-family: 'JetBrains Mono', monospace;
     }}
 
     .card-body {{
-      font-size: 13px;
+      font-size: 11px;
       color: #2D3748;
-      line-height: 1.5;
+      line-height: 1.35;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 8px;
     }}
 
-    /* Highlights / Pill badges */
+    /* Badges */
     .badge-pill {{
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       background: var(--mint-light);
       color: var(--forest);
       border: 1px solid var(--border);
-      padding: 4px 10px;
+      padding: 3px 8px;
       border-radius: 9999px;
-      font-size: 11px;
+      font-size: 9.5px;
       font-weight: 700;
       font-family: 'JetBrains Mono', monospace;
     }}
@@ -419,44 +434,43 @@ html_content = f"""<!DOCTYPE html>
     .feature-grid {{
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
+      gap: 8px;
     }}
 
     .feature-item {{
       background: var(--surface-subtle);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 12px;
+      border-radius: 8px;
+      padding: 7px 9px;
     }}
 
     .feature-item h5 {{
-      font-size: 12.5px;
+      font-size: 10.5px;
       font-weight: 700;
       color: var(--forest);
-      margin-bottom: 4px;
+      margin-bottom: 2px;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
     }}
 
     .feature-item p {{
-      font-size: 11.5px;
+      font-size: 9.5px;
       color: var(--subline);
-      line-height: 1.35;
+      line-height: 1.25;
     }}
 
     /* Terminal Evidence Box */
     .terminal-box {{
       background: var(--terminal-bg);
-      border-radius: 14px;
+      border-radius: 10px;
       border: 1px solid #1E2D24;
       overflow: hidden;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
     }}
 
     .terminal-titlebar {{
       background: #141E18;
-      padding: 8px 12px;
+      padding: 4px 8px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -465,12 +479,12 @@ html_content = f"""<!DOCTYPE html>
 
     .terminal-dots {{
       display: flex;
-      gap: 6px;
+      gap: 4px;
     }}
 
     .terminal-dot {{
-      width: 9px;
-      height: 9px;
+      width: 6.5px;
+      height: 6.5px;
       border-radius: 50%;
     }}
 
@@ -479,67 +493,69 @@ html_content = f"""<!DOCTYPE html>
     .terminal-dot.green {{ background: #27C93F; }}
 
     .terminal-caption {{
-      font-size: 10.5px;
+      font-size: 9px;
       color: #A3B899;
       font-family: 'JetBrains Mono', monospace;
       font-weight: 600;
     }}
 
     .terminal-img-wrap {{
-      padding: 6px;
+      padding: 4px;
       background: #000000;
     }}
 
     .terminal-img-wrap img {{
       width: 100%;
       height: auto;
+      max-height: 135px;
+      object-fit: contain;
       display: block;
-      border-radius: 8px;
+      border-radius: 5px;
     }}
 
     /* Architecture Flow Diagram */
     .arch-diagram {{
       background: var(--surface-subtle);
       border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 14px;
+      border-radius: 10px;
+      padding: 8px 10px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 6px;
     }}
 
     .flow-step {{
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       background: #FFFFFF;
       border: 1px solid var(--border);
-      padding: 10px 14px;
-      border-radius: 10px;
+      padding: 6px 10px;
+      border-radius: 7px;
     }}
 
     .flow-icon {{
-      width: 28px;
-      height: 28px;
-      border-radius: 8px;
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
       background: var(--forest);
       color: #FFFFFF;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 12px;
-      font-weight: 700;
+      font-size: 9px;
+      font-weight: 800;
       flex-shrink: 0;
     }}
 
     .flow-content h6 {{
-      font-size: 12px;
+      font-size: 10.5px;
       font-weight: 700;
       color: var(--ink);
     }}
 
     .flow-content p {{
-      font-size: 10.5px;
+      font-size: 9px;
       color: var(--subline);
     }}
 
@@ -547,7 +563,7 @@ html_content = f"""<!DOCTYPE html>
       text-align: center;
       color: var(--forest);
       font-weight: 900;
-      font-size: 14px;
+      font-size: 10px;
       line-height: 1;
     }}
 
@@ -555,21 +571,21 @@ html_content = f"""<!DOCTYPE html>
     .metrics-table {{
       width: 100%;
       border-collapse: collapse;
-      font-size: 11.5px;
+      font-size: 9.5px;
     }}
 
     .metrics-table th {{
       background: var(--mint-light);
       color: var(--forest);
-      padding: 8px 10px;
+      padding: 5px 8px;
       text-align: left;
       font-weight: 700;
       font-family: 'Inter Tight', sans-serif;
-      border-bottom: 2px solid var(--border);
+      border-bottom: 1.5px solid var(--border);
     }}
 
     .metrics-table td {{
-      padding: 8px 10px;
+      padding: 5px 8px;
       border-bottom: 1px solid var(--border);
       color: var(--ink);
     }}
@@ -582,58 +598,57 @@ html_content = f"""<!DOCTYPE html>
     .stat-bar-container {{
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 5px;
     }}
 
     .stat-row {{
       display: flex;
       align-items: center;
       justify-content: space-between;
-      font-size: 11px;
+      font-size: 9.5px;
       font-family: 'JetBrains Mono', monospace;
     }}
 
     .progress-track {{
       width: 100%;
-      height: 8px;
+      height: 6px;
       background: #E2E8F0;
-      border-radius: 4px;
+      border-radius: 3px;
       overflow: hidden;
-      margin-top: 4px;
+      margin-top: 3px;
     }}
 
     .progress-fill {{
       height: 100%;
-      border-radius: 4px;
+      border-radius: 3px;
       background: var(--forest);
     }}
 
     .progress-fill.amber {{ background: #D97706; }}
     .progress-fill.blue {{ background: #0284C7; }}
 
-    /* Footer */
+    /* Footer Bar */
     .poster-footer {{
-      margin-top: 28px;
       background: var(--surface-subtle);
       border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 18px 28px;
+      border-radius: 12px;
+      padding: 10px 18px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      font-size: 12px;
+      font-size: 10px;
       color: var(--subline);
     }}
 
     .footer-left {{
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 10px;
     }}
 
     .footer-links {{
       display: flex;
-      gap: 20px;
+      gap: 16px;
       font-family: 'JetBrains Mono', monospace;
       font-weight: 600;
     }}
@@ -647,518 +662,539 @@ html_content = f"""<!DOCTYPE html>
       text-decoration: underline;
     }}
 
-    /* Print Formatting (A1 / A2 Landscape Presentation) */
+    /* STRICT A3 LANDSCAPE PRINT RULES (Exactly 1 Page, 420mm x 297mm) */
+    @page {{
+      size: A3 landscape;
+      margin: 6mm;
+    }}
+
     @media print {{
-      body {{
-        padding: 0;
-        background: #FFFFFF;
+      html, body {{
+        width: 408mm !important;
+        height: 285mm !important;
+        max-width: 408mm !important;
+        max-height: 285mm !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #FFFFFF !important;
+        overflow: hidden !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
       }}
+
       .action-bar {{
         display: none !important;
       }}
-      .poster-card {{
-        border: none;
-        box-shadow: none;
-        padding: 20px;
+
+      .poster-container {{
+        width: 100% !important;
+        height: 100% !important;
+        max-width: 100% !important;
+        max-height: 100% !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        border-radius: 0 !important;
       }}
-      @page {{
-        size: A2 landscape;
-        margin: 8mm;
+
+      .card {{
+        box-shadow: none !important;
+        page-break-inside: avoid !important;
+      }}
+
+      .terminal-box img {{
+        max-height: 125px !important;
       }}
     }}
   </style>
 </head>
 <body>
 
-  <div class="poster-container">
-
-    <!-- Action Bar for Printing / PDF Export -->
-    <div class="action-bar">
+  <!-- Top Action Toolbar -->
+  <div class="action-bar">
+    <div class="a3-pill">
+      <span>📐 A3 LANDSCAPE SPECIFICATION</span>
+      <span>•</span>
+      <span>420mm × 297mm (1.414 RATIO)</span>
+    </div>
+    <div class="btn-group">
       <button onclick="window.print()" class="btn btn-primary">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
-        Print Poster / Save as PDF
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+        Print Poster / Save PDF (A3 Landscape)
       </button>
       <a href="https://rashmigowda1206.github.io/WareHouseX/" target="_blank" class="btn btn-secondary">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-        Open Live Deployment
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+        Live Demo
       </a>
     </div>
+  </div>
 
-    <!-- Main Presentation Poster Frame -->
-    <div class="poster-card">
+  <!-- A3 Landscape Master Card -->
+  <div class="poster-container">
 
-      <!-- Header Banner -->
-      <header class="header-banner">
-        <div class="header-top">
-          <div class="university-brand">
-            <div class="uni-logo-mark">AU</div>
-            <div class="uni-text">
-              <h3>Alliance University • School of Advanced Computing</h3>
-              <p>Department of Computer Science and Engineering | IT (AR/VR Specialization)</p>
-            </div>
+    <!-- Header Banner -->
+    <header class="header-banner">
+      <div class="header-top">
+        <div class="university-brand">
+          <div class="uni-logo-mark">AU</div>
+          <div class="uni-text">
+            <h3>Alliance University • School of Advanced Computing</h3>
+            <p>Department of Computer Science and Engineering | IT (AR/VR Specialization)</p>
           </div>
-          <div class="course-badge">
-            COURSE: E1ITA306 DESIGN PROJECT - 1 (2026)
+        </div>
+        <div class="course-badge">
+          COURSE: E1ITA306 DESIGN PROJECT - 1 (2026)
+        </div>
+      </div>
+
+      <div class="header-main">
+        <div class="project-titles">
+          <h1>
+            WareHouseX
+            <span class="title-badge">LINUX OS CONVERGENCE</span>
+          </h1>
+          <h2>Intelligent E-Commerce Warehouse Logistics & Linux Server Administration System</h2>
+          <div class="tagline-strip">
+            <span>SECURE</span> • <span>AUTOMATE</span> • <span>MONITOR</span> • <span>RECOVER</span>
           </div>
         </div>
 
-        <div class="header-main">
-          <div class="project-titles">
-            <h1>
-              WareHouseX
-              <span class="title-badge">LINUX OS CONVERGENCE</span>
-            </h1>
-            <h2>Intelligent E-Commerce Warehouse Logistics & Linux Server Administration System</h2>
-            <div class="tagline-strip">
-              <span>SECURE</span> • <span>AUTOMATE</span> • <span>MONITOR</span> • <span>RECOVER</span>
+        <!-- 4 Team Members & Mentor Card -->
+        <div class="presenters-card">
+          <div class="presenters-header">
+            <span>Project Team Members (Presenters)</span>
+            <span>Specialization: IT (AR/VR)</span>
+          </div>
+          <div class="team-grid">
+            <div class="team-member">
+              <div class="member-avatar">RG</div>
+              <div class="member-info">
+                <h4>Rashmi</h4>
+                <p>2411021061295</p>
+              </div>
+            </div>
+            <div class="team-member">
+              <div class="member-avatar">PK</div>
+              <div class="member-info">
+                <h4>Panchaksharayya</h4>
+                <p>2411021061321</p>
+              </div>
+            </div>
+            <div class="team-member">
+              <div class="member-avatar">DS</div>
+              <div class="member-info">
+                <h4>S Darshan Sai</h4>
+                <p>2411021061289</p>
+              </div>
+            </div>
+            <div class="team-member">
+              <div class="member-avatar">AK</div>
+              <div class="member-info">
+                <h4>Apoorva P Keretot</h4>
+                <p>2411021061316</p>
+              </div>
             </div>
           </div>
+          <div class="mentor-bar">
+            <span>FACULTY PROJECT MENTOR:</span>
+            <span>Dr. Jayabhaduri R (Associate Professor, ASAC, Alliance University)</span>
+          </div>
+        </div>
+      </div>
+    </header>
 
-          <!-- Students & Mentor Info Card -->
-          <div class="presenters-card">
-            <div class="presenters-header">
-              <span>Project Team Members</span>
-              <span>Branch: IT (AR/VR)</span>
+    <!-- 3-Column Content Body -->
+    <main class="poster-columns">
+
+      <!-- COLUMN 1: Problem, Dual-Engine Architecture & Code Tree -->
+      <div class="col">
+
+        <!-- 01 Problem Statement -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon">01</div>
+            <div class="card-title">
+              <h3>Problem Statement & Motivation</h3>
+              <p>Operational Gaps in Linux Fulfillment Servers</p>
             </div>
-            <div class="team-grid">
-              <div class="team-member">
-                <div class="member-avatar">RG</div>
-                <div class="member-info">
-                  <h4>Rashmi</h4>
-                  <p>Reg No: 2411021061295</p>
-                </div>
+          </div>
+          <div class="card-body">
+            <p>
+              E-commerce warehouse fulfillment centers run on Linux servers, yet web WMS tools are completely isolated from host storage, backups, and security.
+            </p>
+            <div class="feature-grid">
+              <div class="feature-item">
+                <h5>⚠️ Storage Failures</h5>
+                <p>Unmonitored disk spikes cause silent SQLite WAL database corruption.</p>
               </div>
-              <div class="team-member">
-                <div class="member-avatar">PK</div>
-                <div class="member-info">
-                  <h4>Panchaksharayya</h4>
-                  <p>Reg No: 2411021061321</p>
-                </div>
+              <div class="feature-item">
+                <h5>⚠️ Untested Backups</h5>
+                <p>Backups lack cryptographic verification, failing during recovery.</p>
               </div>
-              <div class="team-member">
-                <div class="member-avatar">DS</div>
-                <div class="member-info">
-                  <h4>S Darshan Sai</h4>
-                  <p>Reg No: 2411021061289</p>
-                </div>
+              <div class="feature-item">
+                <h5>⚠️ Shell Injection</h5>
+                <p>Granting operators unconstrained terminal access risks injection.</p>
               </div>
-              <div class="team-member">
-                <div class="member-avatar">AK</div>
-                <div class="member-info">
-                  <h4>Apoorva P Keretot</h4>
-                  <p>Reg No: 2411021061316</p>
-                </div>
+              <div class="feature-item">
+                <h5>⚠️ Identity Silos</h5>
+                <p>Staff catalog accounts are decoupled from Linux /etc/passwd.</p>
               </div>
-            </div>
-            <div class="mentor-bar">
-              <span>FACULTY PROJECT MENTOR:</span>
-              <span>Dr. Jayabhaduri R (Associate Professor, ASAC)</span>
             </div>
           </div>
         </div>
-      </header>
 
-      <!-- 3-Column Content Section -->
-      <main class="poster-columns">
-
-        <!-- COLUMN 1: Problem, Objectives & Architecture -->
-        <div class="col">
-
-          <!-- 1. Executive Summary & Problem Statement -->
-          <div class="card">
-            <div class="card-header">
-              <div class="card-icon">01</div>
-              <div class="card-title">
-                <h3>Problem Statement & Motivation</h3>
-                <p>Infrastructure Gaps in Modern Fulfillment Centers</p>
-              </div>
-            </div>
-            <div class="card-body">
-              <p>
-                High-volume e-commerce fulfillment hubs run on production Linux servers (Ubuntu/Debian), yet warehouse management systems (WMS) operate entirely in isolation from the host operating system.
-              </p>
-              <div class="feature-grid">
-                <div class="feature-item">
-                  <h5>⚠️ Storage Vulnerabilities</h5>
-                  <p>Unmonitored disk exhaustion causes silent SQLite WAL corruption during sudden restocking spikes.</p>
-                </div>
-                <div class="feature-item">
-                  <h5>⚠️ Unverified Backups</h5>
-                  <p>Standard backups lack cryptographic preflight checks, leading to catastrophic restore failures.</p>
-                </div>
-                <div class="feature-item">
-                  <h5>⚠️ Command Injection</h5>
-                  <p>Granting web administrators arbitrary shell/SSH access introduces critical security vulnerabilities.</p>
-                </div>
-                <div class="feature-item">
-                  <h5>⚠️ Identity Silos</h5>
-                  <p>Employee catalog accounts are decoupled from Linux system accounts (<code style="font-size:10px;">/etc/passwd</code>) and group privileges.</p>
-                </div>
-              </div>
+        <!-- 02 System Architecture -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon">02</div>
+            <div class="card-title">
+              <h3>Dual-Engine Architecture</h3>
+              <p>Web Logistics Fused with Safe Linux POSIX Layer</p>
             </div>
           </div>
-
-          <!-- 2. Dual-Engine Architecture -->
-          <div class="card">
-            <div class="card-header">
-              <div class="card-icon">02</div>
-              <div class="card-title">
-                <h3>Dual-Engine System Architecture</h3>
-                <p>Safe POSIX Bridge & Hardware Abstraction</p>
+          <div class="card-body">
+            <div class="arch-diagram">
+              <div class="flow-step">
+                <div class="flow-icon">UI</div>
+                <div class="flow-content">
+                  <h6>React 19 + TypeScript Frontend</h6>
+                  <p>Soft Mint Studio theme, Recharts, Vite, JWT persistence</p>
+                </div>
+              </div>
+              <div class="flow-arrow">↓ HTTPS / REST API</div>
+              <div class="flow-step">
+                <div class="flow-icon">API</div>
+                <div class="flow-content">
+                  <h6>Python 3.13 Flask Backend</h6>
+                  <p>Role-based JWT, SQLite WAL mode, PBKDF2:SHA-256 security</p>
+                </div>
+              </div>
+              <div class="flow-arrow">↓ Parameter-Validated IPC</div>
+              <div class="flow-step">
+                <div class="flow-icon">OS</div>
+                <div class="flow-content">
+                  <h6>Ubuntu Linux System Bridge</h6>
+                  <p>Direct POSIX bindings: /proc, systemd, LVM2, UFW, TAR</p>
+                </div>
               </div>
             </div>
-            <div class="card-body">
-              <div class="arch-diagram">
-                <div class="flow-step">
-                  <div class="flow-icon">UI</div>
-                  <div class="flow-content">
-                    <h6>React 19 + TypeScript Dashboard</h6>
-                    <p>Soft Mint Studio theme, Vite, Recharts, Lucide icons, JWT session auth</p>
-                  </div>
-                </div>
-                <div class="flow-arrow">↓ HTTPS / REST API</div>
-                <div class="flow-step">
-                  <div class="flow-icon">API</div>
-                  <div class="flow-content">
-                    <h6>Python 3.13 Flask Backend Service</h6>
-                    <p>Role-based access control, SQLite 3 in WAL mode, PBKDF2:SHA-256 password security</p>
-                  </div>
-                </div>
-                <div class="flow-arrow">↓ Parameterized Allowlisted IPC</div>
-                <div class="flow-step">
-                  <div class="flow-icon">OS</div>
-                  <div class="flow-content">
-                    <h6>Ubuntu Linux System Bridge Layer</h6>
-                    <p>Direct POSIX bindings: <code style="font-size:10.5px;">/proc</code>, systemd daemons, LVM2, UFW firewall, TAR</p>
-                  </div>
-                </div>
-              </div>
-              <div class="badge-pill">
-                <span>🛡️ ZERO ARBITRARY SHELL EXECUTION: Strictly allowlisted parameters</span>
-              </div>
+            <div class="badge-pill">
+              <span>🛡️ ZERO ARBITRARY SHELL: Strictly allowlisted parameters</span>
             </div>
           </div>
-
-          <!-- 3. Repository Structure Evidence -->
-          <div class="card">
-            <div class="card-header">
-              <div class="card-icon">03</div>
-              <div class="card-title">
-                <h3>Project Codebase Inspection</h3>
-                <p>Verified Directory Structure & Organization</p>
-              </div>
-            </div>
-            <div class="card-body">
-              <div class="terminal-box">
-                <div class="terminal-titlebar">
-                  <div class="terminal-dots">
-                    <span class="terminal-dot red"></span>
-                    <span class="terminal-dot yellow"></span>
-                    <span class="terminal-dot green"></span>
-                  </div>
-                  <span class="terminal-caption">tree -L 2 /home/rashmigowda/WareHouseX</span>
-                </div>
-                <div class="terminal-img-wrap">
-                  <img src="{images['02_application_tree.png']}" alt="Application Hierarchy Tree">
-                </div>
-              </div>
-            </div>
-          </div>
-
         </div>
 
-        <!-- COLUMN 2: Linux Administration & Core Systems -->
-        <div class="col">
-
-          <!-- 4. LVM Storage Management -->
-          <div class="card">
-            <div class="card-header">
-              <div class="card-icon">04</div>
-              <div class="card-title">
-                <h3>LVM2 Storage & Volume Management</h3>
-                <p>Dynamic Physical, Volume & Logical Partitioning</p>
-              </div>
+        <!-- 03 Codebase Tree -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon">03</div>
+            <div class="card-title">
+              <h3>Project Codebase Inspection</h3>
+              <p>Standard Linux Filesystem Organization</p>
             </div>
-            <div class="card-body">
-              <p>
-                Dynamic allocation of physical disks (<code style="font-size:11px;">pvs</code>), volume groups (<code style="font-size:11px;">vgs</code>), and logical volumes (<code style="font-size:11px;">lvs</code>) ensures non-disruptive storage scaling as inventory catalogs expand.
-              </p>
-              <div class="terminal-box">
-                <div class="terminal-titlebar">
-                  <div class="terminal-dots">
-                    <span class="terminal-dot red"></span>
-                    <span class="terminal-dot yellow"></span>
-                    <span class="terminal-dot green"></span>
-                  </div>
-                  <span class="terminal-caption">bash backend/scripts/storage_info.sh</span>
+          </div>
+          <div class="card-body">
+            <div class="terminal-box">
+              <div class="terminal-titlebar">
+                <div class="terminal-dots">
+                  <span class="terminal-dot red"></span>
+                  <span class="terminal-dot yellow"></span>
+                  <span class="terminal-dot green"></span>
                 </div>
-                <div class="terminal-img-wrap">
-                  <img src="{images['07_lvm_storage.png']}" alt="LVM Storage Inspection">
-                </div>
+                <span class="terminal-caption">tree -L 2 /home/rashmigowda/WareHouseX</span>
               </div>
-              <div class="stat-bar-container">
-                <div class="stat-row">
-                  <span>LVM Pool (/dev/vg_warehousex/lv_data)</span>
-                  <span>142.6 GB / 250.0 GB (57%)</span>
-                </div>
-                <div class="progress-track">
-                  <div class="progress-fill" style="width: 57%;"></div>
-                </div>
+              <div class="terminal-img-wrap">
+                <img src="{images['02_application_tree.png']}" alt="Application Codebase Tree">
               </div>
             </div>
           </div>
-
-          <!-- 5. Automated Backup & Disaster Recovery -->
-          <div class="card">
-            <div class="card-header">
-              <div class="card-icon">05</div>
-              <div class="card-title">
-                <h3>POSIX TAR Backups & Disaster Recovery</h3>
-                <p>Cryptographic Integrity Checksums & Preflight Guards</p>
-              </div>
-            </div>
-            <div class="card-body">
-              <p>
-                Automated cron-scheduled POSIX <code style="font-size:11px;">.tar.gz</code> archives. Flushes SQLite WAL checkpoints, compresses catalog databases and configurations, and generates immutable SHA-256 verification hashes.
-              </p>
-              <div class="terminal-box">
-                <div class="terminal-titlebar">
-                  <div class="terminal-dots">
-                    <span class="terminal-dot red"></span>
-                    <span class="terminal-dot yellow"></span>
-                    <span class="terminal-dot green"></span>
-                  </div>
-                  <span class="terminal-caption">bash backend/scripts/backup_create.sh --type full</span>
-                </div>
-                <div class="terminal-img-wrap">
-                  <img src="{images['10_live_backup_run.png']}" alt="Live Backup Execution & Verification">
-                </div>
-              </div>
-              <div class="feature-grid">
-                <div class="feature-item">
-                  <h5>🔒 Overwrite Protection</h5>
-                  <p>Restores require explicit two-stage preflight confirmation code (<code style="font-size:10px;">RESTORE</code>).</p>
-                </div>
-                <div class="feature-item">
-                  <h5>🔐 SHA-256 Verification</h5>
-                  <p>Bit-level archive integrity confirmed prior to extraction via <code style="font-size:10px;">sha256sum</code>.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- 6. Firewall & Security Enforcement -->
-          <div class="card">
-            <div class="card-header">
-              <div class="card-icon">06</div>
-              <div class="card-title">
-                <h3>UFW Firewall & Host Security Hardening</h3>
-                <p>Packet Filtering, OpenSSH Audit & User Mapping</p>
-              </div>
-            </div>
-            <div class="card-body">
-              <div class="terminal-box">
-                <div class="terminal-titlebar">
-                  <div class="terminal-dots">
-                    <span class="terminal-dot red"></span>
-                    <span class="terminal-dot yellow"></span>
-                    <span class="terminal-dot green"></span>
-                  </div>
-                  <span class="terminal-caption">ufw status verbose & sshd security audit</span>
-                </div>
-                <div class="terminal-img-wrap">
-                  <img src="{images['08_ufw_firewall.png']}" alt="UFW Firewall & Security Audit">
-                </div>
-              </div>
-              <p style="font-size:12px; color:var(--subline);">
-                Enforces strict port policies: SSH (22), HTTP (5173), Flask API (5000). Provisions synchronized POSIX system users in <code style="font-size:10.5px;">/etc/passwd</code> matching warehouse personnel roles.
-              </p>
-            </div>
-          </div>
-
         </div>
 
-        <!-- COLUMN 3: Telemetry, Logistics & Evaluation -->
-        <div class="col">
+      </div>
 
-          <!-- 7. Hardware Telemetry & Systemd -->
-          <div class="card">
-            <div class="card-header">
-              <div class="card-icon">07</div>
-              <div class="card-title">
-                <h3>Systemd Daemons & Telemetry Stream</h3>
-                <p>Sub-Second Polling via Linux Kernel /proc</p>
+      <!-- COLUMN 2: Storage, Backups & Host Security -->
+      <div class="col">
+
+        <!-- 04 LVM Storage -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon">04</div>
+            <div class="card-title">
+              <h3>LVM2 Storage & Volume Management</h3>
+              <p>Dynamic Physical, Volume & Logical Partitions</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <p>
+              Dynamic management of physical disks (<code>pvs</code>), volume groups (<code>vgs</code>), and logical volumes (<code>lvs</code>) ensures non-disruptive storage expansion.
+            </p>
+            <div class="terminal-box">
+              <div class="terminal-titlebar">
+                <div class="terminal-dots">
+                  <span class="terminal-dot red"></span>
+                  <span class="terminal-dot yellow"></span>
+                  <span class="terminal-dot green"></span>
+                </div>
+                <span class="terminal-caption">bash backend/scripts/storage_info.sh</span>
+              </div>
+              <div class="terminal-img-wrap">
+                <img src="{images['07_lvm_storage.png']}" alt="LVM Storage Inspection">
               </div>
             </div>
-            <div class="card-body">
-              <div class="terminal-box">
-                <div class="terminal-titlebar">
-                  <div class="terminal-dots">
-                    <span class="terminal-dot red"></span>
-                    <span class="terminal-dot yellow"></span>
-                    <span class="terminal-dot green"></span>
-                  </div>
-                  <span class="terminal-caption">systemctl status warehousex nginx ufw cron</span>
-                </div>
-                <div class="terminal-img-wrap">
-                  <img src="{images['06_systemd_status.png']}" alt="Systemd Daemon Services">
-                </div>
+            <div class="stat-bar-container">
+              <div class="stat-row">
+                <span>LVM Data Pool (/dev/vg_warehousex/lv_data)</span>
+                <span>142.6 GB / 250 GB (57%)</span>
               </div>
-              <div class="stat-bar-container">
-                <div class="stat-row">
-                  <span>CPU Utilization (Ubuntu 6.8 Scheduler)</span>
-                  <span>24.8% Active (8 Cores)</span>
+              <div class="progress-track">
+                <div class="progress-fill" style="width: 57%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 05 POSIX TAR Backups -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon">05</div>
+            <div class="card-title">
+              <h3>POSIX TAR Backups & Disaster Recovery</h3>
+              <p>Cryptographic SHA-256 Checksums & Preflight Guards</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <p>
+              Cron-automated compressed <code>.tar.gz</code> archives. Checkpoints SQLite WAL, packages catalogs, and computes SHA-256 verification hashes.
+            </p>
+            <div class="terminal-box">
+              <div class="terminal-titlebar">
+                <div class="terminal-dots">
+                  <span class="terminal-dot red"></span>
+                  <span class="terminal-dot yellow"></span>
+                  <span class="terminal-dot green"></span>
                 </div>
-                <div class="progress-track">
-                  <div class="progress-fill" style="width: 25%;"></div>
+                <span class="terminal-caption">bash backend/scripts/backup_create.sh --type full</span>
+              </div>
+              <div class="terminal-img-wrap">
+                <img src="{images['10_live_backup_run.png']}" alt="Live Backup Run with SHA-256">
+              </div>
+            </div>
+            <div class="feature-grid">
+              <div class="feature-item">
+                <h5>🔒 Overwrite Guard</h5>
+                <p>Restores require explicit preflight code (<code>RESTORE</code>).</p>
+              </div>
+              <div class="feature-item">
+                <h5>🔐 SHA-256 Verified</h5>
+                <p>Integrity confirmed prior to extraction via <code>sha256sum</code>.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 06 UFW Firewall -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon">06</div>
+            <div class="card-title">
+              <h3>UFW Firewall & Host Security Hardening</h3>
+              <p>Port Policies, OpenSSH Audits & /etc/passwd Sync</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="terminal-box">
+              <div class="terminal-titlebar">
+                <div class="terminal-dots">
+                  <span class="terminal-dot red"></span>
+                  <span class="terminal-dot yellow"></span>
+                  <span class="terminal-dot green"></span>
                 </div>
-                <div class="stat-row" style="margin-top:4px;">
-                  <span>RAM Memory Headroom (16 GB ECC)</span>
-                  <span>6.8 GB / 16.0 GB (42.5%)</span>
+                <span class="terminal-caption">ufw status verbose & sshd policy audit</span>
+              </div>
+              <div class="terminal-img-wrap">
+                <img src="{images['08_ufw_firewall.png']}" alt="UFW Firewall & SSH Audit">
+              </div>
+            </div>
+            <p style="font-size:10px; color:var(--subline);">
+              Enforces strict port rules: SSH (22), Frontend (5173), Flask API (5000). Provisions synchronized POSIX user accounts in <code>/etc/passwd</code>.
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- COLUMN 3: Telemetry, Inventory Valuation & Benchmarks -->
+      <div class="col">
+
+        <!-- 07 Systemd & Kernel Telemetry -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon">07</div>
+            <div class="card-title">
+              <h3>Systemd Daemons & Telemetry Stream</h3>
+              <p>Sub-Second Polling via Linux Kernel /proc</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="terminal-box">
+              <div class="terminal-titlebar">
+                <div class="terminal-dots">
+                  <span class="terminal-dot red"></span>
+                  <span class="terminal-dot yellow"></span>
+                  <span class="terminal-dot green"></span>
                 </div>
-                <div class="progress-track">
-                  <div class="progress-fill blue" style="width: 43%;"></div>
+                <span class="terminal-caption">systemctl status warehousex nginx ufw cron</span>
+              </div>
+              <div class="terminal-img-wrap">
+                <img src="{images['06_systemd_status.png']}" alt="Systemd Daemons Controller">
+              </div>
+            </div>
+            <div class="stat-bar-container">
+              <div class="stat-row">
+                <span>CPU Load (Ubuntu 6.8 Scheduler)</span>
+                <span>24.8% Active (8 Cores)</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width: 25%;"></div>
+              </div>
+              <div class="stat-row" style="margin-top:2px;">
+                <span>RAM Headroom (16 GB ECC)</span>
+                <span>6.8 GB / 16.0 GB (42.5%)</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill blue" style="width: 43%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 08 Inventory Valuation Breakdown -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon">08</div>
+            <div class="card-title">
+              <h3>Inventory Valuation & Logistics Zones</h3>
+              <p>Asset Allocation across 6 Fulfillment Zones</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div style="background:var(--surface-subtle); border:1px solid var(--border); border-radius:8px; padding:8px 10px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                <span style="font-size:10.5px; font-weight:700; color:var(--forest);">TOTAL ASSETS: $384,500</span>
+                <span style="font-size:9.5px; font-family:'JetBrains Mono'; color:var(--subline);">25 SKUs • 6 Zones</span>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:4px;">
+                <div>
+                  <div style="display:flex; justify-content:space-between; font-size:9.5px;">
+                    <span>Machinery (Zone B)</span>
+                    <b>$152,000 (39.5%)</b>
+                  </div>
+                  <div class="progress-track"><div class="progress-fill" style="width:40%; background:#08482D;"></div></div>
+                </div>
+                <div>
+                  <div style="display:flex; justify-content:space-between; font-size:9.5px;">
+                    <span>Electronics (Zone A)</span>
+                    <b>$98,500 (25.6%)</b>
+                  </div>
+                  <div class="progress-track"><div class="progress-fill" style="width:26%; background:#059669;"></div></div>
+                </div>
+                <div>
+                  <div style="display:flex; justify-content:space-between; font-size:9.5px;">
+                    <span>IT Hardware (Server Room)</span>
+                    <b>$58,200 (15.1%)</b>
+                  </div>
+                  <div class="progress-track"><div class="progress-fill" style="width:15%; background:#0284C7;"></div></div>
+                </div>
+                <div>
+                  <div style="display:flex; justify-content:space-between; font-size:9.5px;">
+                    <span>Storage Hardware (Zone E)</span>
+                    <b>$36,800 (9.6%)</b>
+                  </div>
+                  <div class="progress-track"><div class="progress-fill" style="width:10%; background:#D97706;"></div></div>
+                </div>
+                <div>
+                  <div style="display:flex; justify-content:space-between; font-size:9.5px;">
+                    <span>Packaging & Safety (Zones C & D)</span>
+                    <b>$39,000 (10.2%)</b>
+                  </div>
+                  <div class="progress-track"><div class="progress-fill" style="width:10%; background:#DB2777;"></div></div>
                 </div>
               </div>
             </div>
           </div>
+        </div>
 
-          <!-- 8. Inventory Valuation & Logistics -->
-          <div class="card">
-            <div class="card-header">
-              <div class="card-icon">08</div>
-              <div class="card-title">
-                <h3>Warehouse Inventory & Logistics Zones</h3>
-                <p>Asset Valuation & Stock Allocation Breakdown</p>
-              </div>
-            </div>
-            <div class="card-body">
-              <div style="background:var(--surface-subtle); border:1px solid var(--border); border-radius:12px; padding:12px;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                  <span style="font-size:12px; font-weight:700; color:var(--forest);">TOTAL ASSETS: $384,500</span>
-                  <span style="font-size:11px; font-family:'JetBrains Mono'; color:var(--subline);">25 SKUs • 6 Zones</span>
-                </div>
-                <div style="display:flex; flex-direction:column; gap:6px;">
-                  <div>
-                    <div style="display:flex; justify-content:space-between; font-size:10.5px;">
-                      <span>Machinery (Zone B)</span>
-                      <b>$152,000 (39.5%)</b>
-                    </div>
-                    <div class="progress-track"><div class="progress-fill" style="width:40%; background:#08482D;"></div></div>
-                  </div>
-                  <div>
-                    <div style="display:flex; justify-content:space-between; font-size:10.5px;">
-                      <span>Electronics (Zone A)</span>
-                      <b>$98,500 (25.6%)</b>
-                    </div>
-                    <div class="progress-track"><div class="progress-fill" style="width:26%; background:#059669;"></div></div>
-                  </div>
-                  <div>
-                    <div style="display:flex; justify-content:space-between; font-size:10.5px;">
-                      <span>IT Hardware (Server Room)</span>
-                      <b>$58,200 (15.1%)</b>
-                    </div>
-                    <div class="progress-track"><div class="progress-fill" style="width:15%; background:#0284C7;"></div></div>
-                  </div>
-                  <div>
-                    <div style="display:flex; justify-content:space-between; font-size:10.5px;">
-                      <span>Storage Hardware (Zone E)</span>
-                      <b>$36,800 (9.6%)</b>
-                    </div>
-                    <div class="progress-track"><div class="progress-fill" style="width:10%; background:#D97706;"></div></div>
-                  </div>
-                  <div>
-                    <div style="display:flex; justify-content:space-between; font-size:10.5px;">
-                      <span>Packaging Materials (Zone C)</span>
-                      <b>$24,500 (6.4%)</b>
-                    </div>
-                    <div class="progress-track"><div class="progress-fill" style="width:6%; background:#DB2777;"></div></div>
-                  </div>
-                  <div>
-                    <div style="display:flex; justify-content:space-between; font-size:10.5px;">
-                      <span>Safety Gear (Zone D)</span>
-                      <b>$14,500 (3.8%)</b>
-                    </div>
-                    <div class="progress-track"><div class="progress-fill" style="width:4%; background:#7C3AED;"></div></div>
-                  </div>
-                </div>
-              </div>
+        <!-- 09 Evaluation Benchmarks -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon">09</div>
+            <div class="card-title">
+              <h3>Evaluation Benchmarks & Outcomes</h3>
+              <p>Empirical Performance & Verification Results</p>
             </div>
           </div>
-
-          <!-- 9. Evaluation Results & Performance Benchmarks -->
-          <div class="card">
-            <div class="card-header">
-              <div class="card-icon">09</div>
-              <div class="card-title">
-                <h3>Evaluation Benchmarks & Outcomes</h3>
-                <p>Empirical Performance & Verification Results</p>
-              </div>
-            </div>
-            <div class="card-body">
-              <table class="metrics-table">
-                <thead>
-                  <tr>
-                    <th>Evaluation Parameter</th>
-                    <th>Standard Method</th>
-                    <th>WareHouseX Achieved</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td><b>Telemetry Latency</b></td>
-                    <td>1,200ms (Heavy polling)</td>
-                    <td><b>&lt; 15ms</b> (/proc direct parsing)</td>
-                  </tr>
-                  <tr>
-                    <td><b>Backup Verification</b></td>
-                    <td>Manual file checking</td>
-                    <td><b>100% Automated SHA-256</b></td>
-                  </tr>
-                  <tr>
-                    <td><b>Recovery Time (RTO)</b></td>
-                    <td>18–25 mins</td>
-                    <td><b>&lt; 45 seconds</b></td>
-                  </tr>
-                  <tr>
-                    <td><b>Shell Security</b></td>
-                    <td>Raw sudo bash scripts</td>
-                    <td><b>Zero Injection (Strict Regex)</b></td>
-                  </tr>
-                  <tr>
-                    <td><b>Account Provisioning</b></td>
-                    <td>Decoupled web accounts</td>
-                    <td><b>POSIX /etc/passwd Synchronized</b></td>
-                  </tr>
-                </tbody>
-              </table>
-              <div class="badge-pill" style="background:#EDF4E4;">
-                <span>✅ ALL LINUX KERNEL, LVM & FIREWALL BENCHMARKS VERIFIED</span>
-              </div>
+          <div class="card-body">
+            <table class="metrics-table">
+              <thead>
+                <tr>
+                  <th>Evaluation Parameter</th>
+                  <th>Standard Method</th>
+                  <th>WareHouseX Achieved</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><b>Telemetry Latency</b></td>
+                  <td>1,200ms (Heavy polling)</td>
+                  <td><b>&lt; 15ms</b> (/proc direct parsing)</td>
+                </tr>
+                <tr>
+                  <td><b>Backup Verification</b></td>
+                  <td>Manual file checking</td>
+                  <td><b>100% Automated SHA-256</b></td>
+                </tr>
+                <tr>
+                  <td><b>Recovery Time (RTO)</b></td>
+                  <td>18–25 mins</td>
+                  <td><b>&lt; 45 seconds</b></td>
+                </tr>
+                <tr>
+                  <td><b>Shell Security</b></td>
+                  <td>Raw sudo bash scripts</td>
+                  <td><b>Zero Injection (Strict Regex)</b></td>
+                </tr>
+                <tr>
+                  <td><b>Account Provisioning</b></td>
+                  <td>Decoupled web database</td>
+                  <td><b>POSIX /etc/passwd Synchronized</b></td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="badge-pill" style="background:#EDF4E4;">
+              <span>✅ ALL LINUX KERNEL, LVM & FIREWALL BENCHMARKS VERIFIED</span>
             </div>
           </div>
-
         </div>
 
-      </main>
+      </div>
 
-      <!-- Footer Bar -->
-      <footer class="poster-footer">
-        <div class="footer-left">
-          <span style="font-weight:700; color:var(--forest); font-family:'Inter Tight', sans-serif;">WareHouseX Project Presentation Dossier</span>
-          <span>•</span>
-          <span>Alliance University, Bengaluru, India</span>
-          <span>•</span>
-          <span>Design Project - 1 Review 2026</span>
-        </div>
-        <div class="footer-links">
-          <span>GitHub: <a href="https://github.com/Rashmigowda1206/WareHouseX" target="_blank">Rashmigowda1206/WareHouseX</a></span>
-          <span>•</span>
-          <span>Demo: <a href="https://rashmigowda1206.github.io/WareHouseX/" target="_blank">rashmigowda1206.github.io/WareHouseX/</a></span>
-        </div>
-      </footer>
+    </main>
 
-    </div>
+    <!-- Footer Bar -->
+    <footer class="poster-footer">
+      <div class="footer-left">
+        <span style="font-weight:700; color:var(--forest); font-family:'Inter Tight', sans-serif;">WareHouseX Technical Presentation Dossier</span>
+        <span>•</span>
+        <span>Alliance University, Bengaluru, India</span>
+        <span>•</span>
+        <span>Design Project - 1 Review 2026</span>
+      </div>
+      <div class="footer-links">
+        <span>GitHub: <a href="https://github.com/Rashmigowda1206/WareHouseX" target="_blank">github.com/Rashmigowda1206/WareHouseX</a></span>
+        <span>•</span>
+        <span>Demo: <a href="https://rashmigowda1206.github.io/WareHouseX/" target="_blank">rashmigowda1206.github.io/WareHouseX/</a></span>
+      </div>
+    </footer>
 
   </div>
 
@@ -1170,4 +1206,4 @@ output_path = 'WareHouseX_Presentation_Poster.html'
 with open(output_path, 'w', encoding='utf-8') as f_out:
     f_out.write(html_content)
 
-print(f"Generated {output_path} successfully. File size: {os.path.getsize(output_path)} bytes.")
+print(f"Generated A3 Landscape poster: {output_path}. Size: {os.path.getsize(output_path)} bytes.")
