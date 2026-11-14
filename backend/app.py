@@ -1,7 +1,7 @@
 import os
 from flask import Flask, jsonify, send_from_directory
 from flask_cors import CORS
-from config import SECRET_KEY, HOST, PORT, DEBUG, SYSTEM_MODE
+from config import SECRET_KEY, HOST, PORT, DEBUG, SYSTEM_MODE, QDRANT_COLLECTION_NAME, VECTOR_DIMENSION
 from database.db import init_db
 from database.seed_data import seed_database
 from system_bridge.linux_adapter import LinuxAdapter
@@ -19,14 +19,23 @@ def create_app():
     # Enable CORS for frontend Vite dev & production
     CORS(app, resources={r"/api/*": {"origins": "*"}}, supports_credentials=True)
 
-    # Initialize Database and Seed Data
+    # Initialize SQLite Database & Seed Data
     with app.app_context():
         seed_database()
+        try:
+            from database.qdrant_manager import qdrant_manager
+            if qdrant_manager.count_items() == 0:
+                from database.migrate_to_qdrant import migrate_sqlite_to_qdrant
+                migrate_sqlite_to_qdrant()
+        except Exception as e:
+            app.logger.warning(f"Qdrant startup synchronization notice: {e}")
 
     # Register API Blueprints
     from modules.auth import auth_bp
     from modules.employees import employees_bp
     from modules.inventory import inventory_bp
+    from modules.search import search_bp
+    from modules.qdrant_backup import qdrant_backup_bp
     from modules.storage import storage_bp
     from modules.backups import backups_bp
     from modules.recovery import recovery_bp
@@ -38,6 +47,8 @@ def create_app():
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
     app.register_blueprint(employees_bp, url_prefix="/api/employees")
     app.register_blueprint(inventory_bp, url_prefix="/api/inventory")
+    app.register_blueprint(search_bp, url_prefix="/api/search")
+    app.register_blueprint(qdrant_backup_bp, url_prefix="/api/backups/qdrant")
     app.register_blueprint(storage_bp, url_prefix="/api/storage")
     app.register_blueprint(backups_bp, url_prefix="/api/backups")
     app.register_blueprint(recovery_bp, url_prefix="/api/recovery")
@@ -48,12 +59,23 @@ def create_app():
 
     @app.route("/api/health", methods=["GET"])
     def health_check():
+        from database.qdrant_manager import qdrant_manager
+        qdrant_ok = qdrant_manager.is_alive()
+        qdrant_count = qdrant_manager.count_items() if qdrant_ok else 0
+
         return jsonify({
             "status": "online",
             "service": "WareHouseX Enterprise API",
-            "version": "2.4.0",
+            "version": "2.5.0",
             "mode": system_adapter.get_current_mode(),
-            "is_linux": system_adapter.is_linux
+            "is_linux": system_adapter.is_linux,
+            "vector_database": {
+                "engine": "Qdrant Vector Database",
+                "status": "connected" if qdrant_ok else "unreachable",
+                "collection": QDRANT_COLLECTION_NAME,
+                "vector_dimension": VECTOR_DIMENSION,
+                "total_vector_points": qdrant_count,
+            }
         }), 200
 
     # Serve built React frontend single-page application

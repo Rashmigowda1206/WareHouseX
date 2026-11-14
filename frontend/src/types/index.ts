@@ -1,4 +1,4 @@
-export type UserRole = 'admin' | 'manager' | 'staff';
+export type UserRole = 'admin' | 'manager' | 'staff' | 'OWNER' | 'WAREHOUSE_MANAGER' | 'INVENTORY_STAFF' | 'DISPATCH_STAFF' | 'owner';
 export type UserStatus = 'active' | 'inactive' | 'suspended';
 
 export interface User {
@@ -14,18 +14,31 @@ export interface User {
 }
 
 export interface InventoryItem {
-  id: number;
+  id: number | string;
   product_id: string;
   name: string;
   category: string;
   quantity: number;
   unit_price: number;
   supplier: string;
-  stock_status: 'In Stock' | 'Low Stock' | 'Out of Stock' | 'Overstocked';
+  stock_status: 'In Stock' | 'Low Stock' | 'Out of Stock' | 'Overstocked' | string;
   reorder_point: number;
   location_zone: string;
   sku: string;
   last_updated?: string;
+  // Qdrant vector database schema extensions
+  item_id?: string;
+  item_name?: string;
+  SKU?: string;
+  barcode?: string;
+  description?: string;
+  minimum_stock?: number;
+  warehouse_location?: string;
+  status?: string;
+  date_added?: string;
+  score?: number;
+  similarity_percent?: string;
+  match_type?: 'exact' | 'semantic' | 'similar';
 }
 
 export interface InventorySummary {
@@ -35,13 +48,48 @@ export interface InventorySummary {
   low_stock_count: number;
   out_of_stock_count: number;
   total_orders: number;
+  pending_orders?: number;
   total_revenue: number;
+  primary_database?: string;
   categories: {
     category: string;
     count: number;
     value: number;
     quantity: number;
   }[];
+}
+
+export interface SearchResult {
+  query: string;
+  cleaned_query?: string;
+  auto_detected_filters?: Record<string, string>;
+  results: InventoryItem[];
+  count: number;
+  limit?: number;
+  offset?: number;
+}
+
+export interface SearchFilters {
+  categories: string[];
+  warehouse_locations: string[];
+  suppliers: string[];
+  statuses: string[];
+}
+
+export interface QdrantBackupStatus {
+  database: string;
+  collection: string;
+  total_snapshots: number;
+  latest_snapshot?: {
+    filename: string;
+    size_formatted: string;
+    created_at: string;
+    algorithm: string;
+  } | null;
+  last_recovery?: any;
+  encryption: string;
+  integrity_check: string;
+  health: string;
 }
 
 export interface LinuxSystemAccount {

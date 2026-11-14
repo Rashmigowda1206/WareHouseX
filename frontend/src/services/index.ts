@@ -42,14 +42,14 @@ export const inventoryService = {
       method: 'POST',
       body: JSON.stringify(product),
     }),
-  updateProduct: (id: number, product: Partial<InventoryItem>) =>
+  updateProduct: (id: number | string, product: Partial<InventoryItem>) =>
     apiRequest<{ message: string }>(`/inventory/${id}`, {
       method: 'PUT',
       body: JSON.stringify(product),
     }),
-  deleteProduct: (id: number) =>
+  deleteProduct: (id: number | string) =>
     apiRequest<{ message: string }>(`/inventory/${id}`, { method: 'DELETE' }),
-  adjustStock: (id: number, delta: number, reason: string) =>
+  adjustStock: (id: number | string, delta: number, reason: string) =>
     apiRequest<{ message: string; new_quantity: number; stock_status: string }>(`/inventory/${id}/adjust-stock`, {
       method: 'POST',
       body: JSON.stringify({ delta, reason }),
@@ -191,5 +191,80 @@ export const settingsService = {
     apiRequest<{ message: string }>('/settings/profile', {
       method: 'PUT',
       body: JSON.stringify(profile),
+    }),
+};
+
+// Search Services (Exact & Qdrant Semantic Vector Search)
+export const searchService = {
+  exactSearch: (query: string, type: 'all' | 'item_id' | 'sku' | 'barcode' = 'all') =>
+    apiRequest<{ query: string; search_type: string; items: InventoryItem[]; count: number }>(
+      `/search/exact?query=${encodeURIComponent(query)}&type=${type}`
+    ),
+
+  semanticSearch: (params: {
+    query: string;
+    category?: string;
+    warehouse_location?: string;
+    status?: string;
+    limit?: number;
+    offset?: number;
+  }) =>
+    apiRequest<{
+      query: string;
+      cleaned_query?: string;
+      auto_detected_filters?: Record<string, string>;
+      results: InventoryItem[];
+      count: number;
+    }>('/search/semantic', {
+      method: 'POST',
+      body: JSON.stringify(params),
+    }),
+
+  getSimilar: (itemId: string, limit: number = 6) =>
+    apiRequest<{ item_id: string; similar_items: InventoryItem[]; count: number }>(
+      `/search/similar/${encodeURIComponent(itemId)}?limit=${limit}`
+    ),
+
+  getFilters: () =>
+    apiRequest<{
+      categories: string[];
+      warehouse_locations: string[];
+      suppliers: string[];
+      statuses: string[];
+    }>('/search/filters'),
+};
+
+// Qdrant Vector DB Backup Services
+export const qdrantBackupService = {
+  getStatus: () =>
+    apiRequest<{
+      database: string;
+      collection: string;
+      total_snapshots: number;
+      latest_snapshot: any;
+      last_recovery: any;
+      encryption: string;
+      integrity_check: string;
+      health: string;
+    }>('/backups/qdrant/status'),
+
+  createSnapshot: (backup_type: 'manual' | 'scheduled' = 'manual', notes?: string) =>
+    apiRequest<{ message: string; backup: any }>('/backups/qdrant/snapshot', {
+      method: 'POST',
+      body: JSON.stringify({ backup_type, notes }),
+    }),
+
+  listSnapshots: () =>
+    apiRequest<{ snapshots: any[]; count: number; collection: string }>('/backups/qdrant/list'),
+
+  verifySnapshot: (filename: string) =>
+    apiRequest<{ valid: boolean; filename: string; point_count: number; sha256_checksum: string }>(
+      `/backups/qdrant/verify/${encodeURIComponent(filename)}`
+    ),
+
+  restoreSnapshot: (filename: string) =>
+    apiRequest<{ message: string; result: any }>('/backups/qdrant/restore', {
+      method: 'POST',
+      body: JSON.stringify({ filename }),
     }),
 };

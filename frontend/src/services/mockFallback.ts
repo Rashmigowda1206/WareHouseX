@@ -231,6 +231,171 @@ export async function handleMockRequest<T>(endpoint: string, options: RequestIni
     }
   }
 
+  // --- QDRANT VECTOR SEARCH ---
+  if (url.startsWith('/search')) {
+    let products = getStored<any[]>(STORAGE_KEYS.PRODUCTS, INITIAL_PRODUCTS);
+
+    if (url.startsWith('/search/exact')) {
+      const searchParams = new URLSearchParams(url.includes('?') ? url.split('?')[1] : '');
+      const q = (searchParams.get('query') || '').trim().toLowerCase();
+      const matched = products.filter(
+        (p) =>
+          (p.product_id || '').toLowerCase() === q ||
+          (p.sku || '').toLowerCase() === q ||
+          (p.name || '').toLowerCase() === q
+      ).map((p, idx) => ({
+        id: p.id || idx + 1,
+        item_id: p.product_id || `WHX-${idx + 1001}`,
+        product_id: p.product_id || `WHX-${idx + 1001}`,
+        item_name: p.name,
+        name: p.name,
+        category: p.category || 'General',
+        SKU: p.sku || `SKU-${idx + 1001}`,
+        sku: p.sku || `SKU-${idx + 1001}`,
+        barcode: `890${idx + 1000000000}`,
+        quantity: p.quantity ?? p.stock_quantity ?? 50,
+        unit_price: p.unit_price ?? 99.0,
+        supplier: p.supplier || 'Standard Supply',
+        warehouse_location: p.location_zone || 'Zone A-01-A',
+        location_zone: p.location_zone || 'Zone A-01-A',
+        status: p.stock_status || 'In Stock',
+        stock_status: p.stock_status || 'In Stock',
+        score: 1.0,
+        similarity_percent: '100%',
+        match_type: 'exact'
+      }));
+      return { query: q, search_type: 'all', items: matched, count: matched.length } as unknown as T;
+    }
+
+    if (url.startsWith('/search/semantic')) {
+      const q = (body?.query || new URLSearchParams(url.includes('?') ? url.split('?')[1] : '').get('query') || '').trim();
+      const lower = q.toLowerCase();
+      let statusFilter = body?.status;
+      const detected: Record<string, string> = {};
+
+      if (!statusFilter || statusFilter === 'all') {
+        if (lower.includes('low stock') || lower.includes('low on stock') || lower.includes('reorder')) {
+          statusFilter = 'Low Stock';
+          detected['status'] = 'Low Stock';
+        } else if (lower.includes('out of stock') || lower.includes('depleted')) {
+          statusFilter = 'Out of Stock';
+          detected['status'] = 'Out of Stock';
+        }
+      }
+
+      let filtered = [...products];
+      if (statusFilter && statusFilter !== 'all') {
+        filtered = filtered.filter((p) => (p.stock_status || '').toLowerCase() === statusFilter.toLowerCase());
+      }
+      if (body?.category && body.category !== 'all') {
+        filtered = filtered.filter((p) => (p.category || '').toLowerCase() === body.category.toLowerCase());
+      }
+
+      const results = filtered.map((p, idx) => {
+        const baseScore = Math.max(0.65, 0.95 - (idx * 0.04));
+        return {
+          id: p.id || idx + 1,
+          item_id: p.product_id || `WHX-${idx + 1001}`,
+          product_id: p.product_id || `WHX-${idx + 1001}`,
+          item_name: p.name,
+          name: p.name,
+          category: p.category || 'General',
+          SKU: p.sku || `SKU-${idx + 1001}`,
+          sku: p.sku || `SKU-${idx + 1001}`,
+          barcode: `890${idx + 1000000000}`,
+          quantity: p.quantity ?? p.stock_quantity ?? 50,
+          unit_price: p.unit_price ?? 99.0,
+          supplier: p.supplier || 'Standard Supply',
+          warehouse_location: p.location_zone || 'Zone A-01-A',
+          location_zone: p.location_zone || 'Zone A-01-A',
+          status: p.stock_status || 'In Stock',
+          stock_status: p.stock_status || 'In Stock',
+          score: Math.round(baseScore * 1000) / 1000,
+          similarity_percent: `${(baseScore * 100).toFixed(1)}%`,
+          match_type: 'semantic'
+        };
+      });
+
+      return {
+        query: q,
+        auto_detected_filters: detected,
+        results,
+        count: results.length
+      } as unknown as T;
+    }
+
+    if (url.startsWith('/search/similar/')) {
+      const parts = url.split('/');
+      const itemId = decodeURIComponent(parts[3] ? parts[3].split('?')[0] : '');
+      const similar = products.slice(0, 4).map((p, idx) => ({
+        id: p.id || idx + 1,
+        item_id: p.product_id || `WHX-${idx + 1001}`,
+        product_id: p.product_id || `WHX-${idx + 1001}`,
+        item_name: p.name,
+        name: p.name,
+        category: p.category || 'General',
+        SKU: p.sku || `SKU-${idx + 1001}`,
+        sku: p.sku || `SKU-${idx + 1001}`,
+        quantity: p.quantity ?? p.stock_quantity ?? 50,
+        unit_price: p.unit_price ?? 99.0,
+        supplier: p.supplier || 'Standard Supply',
+        warehouse_location: p.location_zone || 'Zone A-01-A',
+        status: p.stock_status || 'In Stock',
+        similarity_percent: `${(92 - idx * 4).toFixed(1)}%`,
+        match_type: 'similar'
+      }));
+      return { item_id: itemId, similar_items: similar, count: similar.length } as unknown as T;
+    }
+
+    if (url.startsWith('/search/filters')) {
+      const categories = Array.from(new Set(products.map((p) => p.category))).filter(Boolean).sort();
+      const locations = Array.from(new Set(products.map((p) => p.location_zone || p.warehouse_zone))).filter(Boolean).sort();
+      const suppliers = Array.from(new Set(products.map((p) => p.supplier))).filter(Boolean).sort();
+      return {
+        categories: categories.length > 0 ? categories : ['Electronics', 'Machinery', 'Packaging', 'Safety Gear', 'IT Hardware'],
+        warehouse_locations: locations.length > 0 ? locations : ['Zone A-01-A', 'Zone A-01-B', 'Zone B-02-F'],
+        suppliers: suppliers.length > 0 ? suppliers : ['OmniSupply Corp', 'ZebraTech Global', 'LogiPrint Industrial'],
+        statuses: ['In Stock', 'Low Stock', 'Out of Stock', 'Overstocked']
+      } as unknown as T;
+    }
+  }
+
+  // --- QDRANT BACKUPS ---
+  if (url.startsWith('/backups/qdrant')) {
+    if (url.startsWith('/backups/qdrant/status')) {
+      return {
+        database: 'Qdrant Vector Database',
+        collection: 'warehouse_inventory',
+        total_snapshots: 3,
+        latest_snapshot: {
+          filename: 'qdrant_inventory_20261114_065725_manual.whx.enc',
+          size_formatted: '124.4 KB',
+          created_at: new Date().toISOString(),
+          algorithm: 'AES-256 (Fernet)'
+        },
+        last_recovery: { status: 'success', files_restored_count: 25 },
+        encryption: 'AES-256 (Fernet) at rest',
+        integrity_check: 'SHA-256 Checksum',
+        health: 'healthy'
+      } as unknown as T;
+    }
+
+    if (url.startsWith('/backups/qdrant/list')) {
+      return {
+        snapshots: [
+          {
+            filename: 'qdrant_inventory_20261114_065725_manual.whx.enc',
+            size_formatted: '124.4 KB',
+            created_at: new Date().toISOString(),
+            algorithm: 'AES-256 (Fernet)'
+          }
+        ],
+        count: 1,
+        collection: 'warehouse_inventory'
+      } as unknown as T;
+    }
+  }
+
   // --- EMPLOYEES ---
   if (url.startsWith('/employees')) {
     let employees = getStored(STORAGE_KEYS.EMPLOYEES, INITIAL_EMPLOYEES);

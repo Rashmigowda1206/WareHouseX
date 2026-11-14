@@ -30,6 +30,11 @@ setup_evidence.py
 setup_server_config.py
 generate_all_screenshots.py
 UbuntuMono-*.ttf
+poster.pdf
+
+# Qdrant runtime storage and snapshots
+backend/data_vault/qdrant_storage/
+backend/backups_storage/qdrant_snapshots/
 
 # OS / Editor files
 .DS_Store

@@ -39,12 +39,44 @@ def token_required(f):
         return f(*args, **kwargs)
     return decorated
 
+ROLE_ALIASES = {
+    "admin": {"admin", "owner", "OWNER", "WAREHOUSE_MANAGER", "manager", "INVENTORY_STAFF", "DISPATCH_STAFF", "staff"},
+    "owner": {"admin", "owner", "OWNER", "WAREHOUSE_MANAGER", "manager", "INVENTORY_STAFF", "DISPATCH_STAFF", "staff"},
+    "OWNER": {"admin", "owner", "OWNER", "WAREHOUSE_MANAGER", "manager", "INVENTORY_STAFF", "DISPATCH_STAFF", "staff"},
+    "manager": {"manager", "WAREHOUSE_MANAGER", "INVENTORY_STAFF", "DISPATCH_STAFF", "staff"},
+    "WAREHOUSE_MANAGER": {"manager", "WAREHOUSE_MANAGER", "INVENTORY_STAFF", "DISPATCH_STAFF", "staff"},
+    "staff": {"staff", "INVENTORY_STAFF", "DISPATCH_STAFF"},
+    "INVENTORY_STAFF": {"staff", "INVENTORY_STAFF"},
+    "DISPATCH_STAFF": {"staff", "DISPATCH_STAFF"},
+}
+
 def role_required(allowed_roles):
+    """
+    Role-based access control supporting OWNER, WAREHOUSE_MANAGER, INVENTORY_STAFF, DISPATCH_STAFF,
+    as well as existing admin, manager, staff mappings.
+    """
     def decorator(f):
         @wraps(f)
         def decorated(*args, **kwargs):
-            if not hasattr(g, "current_user") or g.current_user.get("role") not in allowed_roles:
-                return jsonify({"error": "Insufficient permissions for this operation"}), 403
+            if not hasattr(g, "current_user") or not g.current_user:
+                return jsonify({"error": "Authentication required"}), 401
+            
+            user_role = str(g.current_user.get("role", "")).strip()
+            # Expand allowed roles based on alias map
+            expanded_allowed = set()
+            for r in allowed_roles:
+                expanded_allowed.add(r)
+                expanded_allowed.add(r.lower())
+                expanded_allowed.add(r.upper())
+
+            # Check if user role matches or has higher privilege
+            user_capabilities = ROLE_ALIASES.get(user_role, {user_role, user_role.lower(), user_role.upper()})
+            if not user_capabilities.intersection(expanded_allowed):
+                return jsonify({
+                    "error": "Insufficient permissions for this operation",
+                    "required_roles": allowed_roles,
+                    "your_role": user_role
+                }), 403
             return f(*args, **kwargs)
         return decorated
     return decorator
